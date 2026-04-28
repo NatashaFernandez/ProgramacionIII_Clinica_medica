@@ -1,15 +1,15 @@
 {
   "name": "tfi_clinica_grupoac",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "C:\\PROGRA~1\\nodejs\\node.exe --watch index.js"
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "mysql2": "^3.9.7",
-    "dotenv": "^16.4.5"
+    "mysql2": "^3.9.7"
   }
 }
