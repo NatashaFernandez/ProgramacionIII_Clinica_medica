@@ -1,25 +1,30 @@
-// Carga de variables de entorno 
+
+// Carga de variables de entorno
 process.loadEnvFile();
 
 import express from 'express';
 
+// Importación de rutas 
+import especialidadesRutas from './src/rutas/especialidadesRutas.js';
+
 const app = express();
 
-//  Middleware para manejar JSON
+// MIDDLEWARE para parsear JSON (Necesario para que funcionen los métodos POST y PUT)
 app.use(express.json());
 
-//  Ruta base de bienvenida (Para probar que la API funciona)
+// RUTA DE ESPECIALIDADES
+app.use('/especialidades', especialidadesRutas);
+
+// Ruta raíz (Bienvenida)
 app.get('/', (req, res) => {
     res.json({
-        mensaje: "API Clínica Médica - TFI Programación III",
-        estado: "En línea",
-        version: "1.0.0"
+        mensaje: "Bienvenido a la API de la Clínica - Grupo AC. Estamos para ayudarlo.",
+        estado: "Servidor funcionando correctamente",
+        entidades: ["/especialidades", "/medicos", "/obras_sociales","/medicos_obras_sociales", "/pacientes", "/turnos_reservas", "/usuarios"]
     });
 });
 
-// Configuración del puerto
 const PORT = process.env.PUERTO || 3000;
-
 app.listen(PORT, () => {
     console.log(`Servidor iniciado en http://localhost:${PORT}`);
 });
