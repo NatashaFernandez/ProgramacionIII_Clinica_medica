@@ -3,6 +3,7 @@
 process.loadEnvFile();
 
 import express from 'express';
+import morgan from 'morgan';
 
 // Importación de rutas 
 import especialidadesRutas from './src/rutas/especialidadesRutas.js';
@@ -11,6 +12,9 @@ const app = express();
 
 // MIDDLEWARE para parsear JSON (Necesario para que funcionen los métodos POST y PUT)
 app.use(express.json());
+
+//Configuración de Morgan
+app.use(morgan('dev'));
 
 // RUTA DE ESPECIALIDADES
 app.use('/especialidades', especialidadesRutas);
