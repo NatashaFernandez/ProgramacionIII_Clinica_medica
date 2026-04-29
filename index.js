@@ -13,7 +13,7 @@ const app = express();
 // MIDDLEWARE para parsear JSON (Necesario para que funcionen los métodos POST y PUT)
 app.use(express.json());
 
-//Configuración de Morgan
+//MIDDLEWARE Morgan "observa"
 app.use(morgan('dev'));
 
 // RUTA DE ESPECIALIDADES
