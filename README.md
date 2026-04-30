@@ -115,3 +115,29 @@ Cada grupo podrá agregar una funcionalidad extra al desarrollo.
 próximo turno a llamar.
 
 ● Endpoint con LLM para identificar posibles diagnósticos.
+
+
+************************************************************ENTREGA DE AVANCES 8-5-2026********************************************************************
+
+iNTEGRANTE: SOLANGE BLANC
+Tareas realizadas:
+Inicialización del proyecto: Configuración de la estructura de carpetas y entorno Node.js. 
+Arquitectura: Implementación de módulos ES6 (import/export) y gestión de variables de entorno con .env. 
+Desarrollo de Entidad: Implementación completa del BREAD para Especialidades. 
+Base de Datos: Configuración del Pool de conexiones con mysql2/promise. 
+Stack TecnológicoMotor: Node.js  
+Framework: Express 
+Base de Datos: MySQL 
+Middlewares: Morgan (logging) y Express.json (parseo)  
+Estructura de Archivos (Especialidades) :
+-index.js: Servidor central y configuración de middlewares. 
+-src/configuracion/db.js: Conexión a la DB mediante variables de entorno. 
+-src/controladores/especialidadesControlador.js: Lógica CRUD y borrado lógico (activo = 1). 
+-src/rutas/especialidadesRutas.js: Definición de endpoints de la entidad.  
+
+INTEGRANTE: IVONNE FERNÁNDEZ
+
+INTEGRANTE: NATASHA FERNÁNDEZ
+
+INTEGRANTE: YANINA GALVÁN
+
