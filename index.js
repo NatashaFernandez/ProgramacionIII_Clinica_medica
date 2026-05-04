@@ -2,6 +2,7 @@
 // Carga de variables de entorno
 process.loadEnvFile();
 
+import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
 import { requiere_session } from './src/middlewares/requiere_session.js';
@@ -12,6 +13,9 @@ import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
 import authRutas from './src/rutas/authRutas.js';
 
 const app = express();
+
+// MIDDLEWARE de CORS para permitir conexiones externas
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 
 // MIDDLEWARE para parsear JSON (Necesario para que funcionen los métodos POST y PUT)
 app.use(express.json());
