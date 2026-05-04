@@ -4,20 +4,29 @@ process.loadEnvFile();
 
 import express from 'express';
 import morgan from 'morgan';
+import { requiere_session } from './src/middlewares/requiere_session.js';
 
 // Importación de rutas 
 import especialidadesRutas from './src/rutas/especialidadesRutas.js';
+import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
+import authRutas from './src/rutas/authRutas.js';
 
 const app = express();
 
 // MIDDLEWARE para parsear JSON (Necesario para que funcionen los métodos POST y PUT)
 app.use(express.json());
 
-//MIDDLEWARE Morgan "observa"
+// MIDDLEWARE Morgan "observa"
 app.use(morgan('dev'));
 
-// RUTA DE ESPECIALIDADES
-app.use('/especialidades', especialidadesRutas);
+// Rutas públicas (No requieren sesión)
+app.use('/auth', authRutas);
+
+// Rutas protegidas por sesión
+
+// El MIDDLEWARE requiere_session se asegura de que haya un usuario logueado antes de chequear permisos
+app.use('/especialidades', requiere_session, especialidadesRutas);
+app.use('/obras_sociales', requiere_session, obrasSocialesRutas);
 
 // Ruta raíz (Bienvenida)
 app.get('/', (req, res) => {
