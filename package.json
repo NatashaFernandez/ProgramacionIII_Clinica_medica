@@ -9,10 +9,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
     "mysql2": "^3.9.7",
-    "jsonwebtoken": "^9.0.3",
-    "cors": "^2.8.5"
+    "validator": "^13.15.35"
   }
 }
