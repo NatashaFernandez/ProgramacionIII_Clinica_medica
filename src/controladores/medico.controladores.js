@@ -1,37 +1,37 @@
 import db from '../configuracion/db.js';
 
-
-// B - Browse: Listar todos
+// B - Browse: Listar todos los médicos
 export const listarMedicos = async (req, res) => {
     try {
 
         const [results] = await db.query(`
             SELECT 
                 m.id_medico,
-                u.apellido,
-                u.nombres,
-                u.email,
-                e.nombre AS especialidad,
                 m.matricula,
                 m.descripcion,
-                m.valor_consulta
+                m.valor_consulta,
+                e.nombre AS especialidad,
+                u.apellido,
+                u.nombres,
+                u.email
             FROM medicos m
-            INNER JOIN usuarios u 
-                ON m.id_usuario = u.id_usuario
             INNER JOIN especialidades e 
                 ON m.id_especialidad = e.id_especialidad
+            INNER JOIN usuarios u
+                ON m.id_usuario = u.id_usuario
             WHERE u.activo = 1
         `);
 
         res.status(200).json(results);
 
     } catch (err) {
+
         res.status(500).json({ error: err.message });
+
     }
 };
 
-
-// R - Read: Obtener uno por ID
+// R - Read: Obtener médico por ID
 export const obtenerMedico = async (req, res) => {
 
     try {
@@ -41,18 +41,18 @@ export const obtenerMedico = async (req, res) => {
         const [results] = await db.query(`
             SELECT 
                 m.id_medico,
-                u.apellido,
-                u.nombres,
-                u.email,
-                e.nombre AS especialidad,
                 m.matricula,
                 m.descripcion,
-                m.valor_consulta
+                m.valor_consulta,
+                e.nombre AS especialidad,
+                u.apellido,
+                u.nombres,
+                u.email
             FROM medicos m
-            INNER JOIN usuarios u 
-                ON m.id_usuario = u.id_usuario
             INNER JOIN especialidades e 
                 ON m.id_especialidad = e.id_especialidad
+            INNER JOIN usuarios u
+                ON m.id_usuario = u.id_usuario
             WHERE m.id_medico = ?
             AND u.activo = 1
         `, [id]);
@@ -66,10 +66,14 @@ export const obtenerMedico = async (req, res) => {
         res.status(200).json(results[0]);
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
 
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+};
 
 // A - Add: Agregar médico
 export const agregarMedico = async (req, res) => {
@@ -108,10 +112,14 @@ export const agregarMedico = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
 
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+};
 
 // E - Edit: Actualizar médico
 export const actualizarMedico = async (req, res) => {
@@ -148,10 +156,14 @@ export const actualizarMedico = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
 
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+};
 
 // D - Delete: Borrado lógico
 export const eliminarMedico = async (req, res) => {
@@ -160,7 +172,6 @@ export const eliminarMedico = async (req, res) => {
 
         const { id } = req.params;
 
-        // desactivar usuario relacionado
         await db.query(`
             UPDATE usuarios u
             INNER JOIN medicos m
@@ -174,6 +185,11 @@ export const eliminarMedico = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            error: err.message
+        });
+
     }
+
 };
