@@ -14,9 +14,20 @@ export const login = async (req, res) => {
     try {
         // Se compara la contraseña directamente en la query usando SHA2-256 de MySQL
         const [resultado] = await db.query(
-            'SELECT id_usuario, email, rol FROM usuarios WHERE email = ? AND contrasenia = SHA2(?, 256) AND activo = 1',
-            [email, contrasenia]
-        );
+    `SELECT 
+        id_usuario,
+        documento,
+        apellido,
+        nombres,
+        email,
+        foto_path,
+        rol
+     FROM usuarios
+     WHERE email = ?
+     AND contrasenia = SHA2(?, 256)
+     AND activo = 1`,
+    [email, contrasenia]
+);
 
         // Si no hay resultados, significa que el email no existe o la contraseña es incorrecta
         // Mostramos un mensaje no tan especifico para más seguridad
