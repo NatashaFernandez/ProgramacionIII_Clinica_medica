@@ -11,6 +11,7 @@ import { requiere_session } from './src/middlewares/requiere_session.js';
 import especialidadesRutas from './src/rutas/especialidadesRutas.js';
 import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
 import authRutas from './src/rutas/authRutas.js';
+import usuariosRutas from './src/rutas/usuariosRutas.js';
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use(morgan('dev'));
 
 // Rutas públicas (No requieren sesión)
 app.use('/auth', authRutas);
+// Rutas de usuarios
+app.use('/usuarios', usuariosRutas);
 
 // Rutas protegidas por sesión
 
