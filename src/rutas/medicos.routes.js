@@ -1,68 +1,127 @@
 import express from 'express';
-
-import {
-    listarMedicos,
-    obtenerMedico,
-    agregarMedico,
-    actualizarMedico,
-    eliminarMedico
-} from '../controladores/medicosControlador.js';
-
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
+import MedicosControlador from '../controladores/medicosControlador.js';
+import { validarCampos } from '../middlewares/validar_campos.js';
+import { requiere_session } from '../middlewares/requiere_session.js';
+import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 const router = express.Router();
 
+const medicosControlador = new MedicosControlador();
 
-// LISTAR
-router.get('/',
-    listarMedicos
+//Listar médicos
+ 
+router.get(
+    '/',
+    requiere_session,
+    requiere_permiso({
+        browse: {
+            medicos: ['*']
+        }
+    }),
+    medicosControlador.buscarTodos
 );
 
+//Obtener médico por ID
 
-// OBTENER UNO
-router.get('/:id',
-    obtenerMedico
+router.get(
+    '/:id_medico',
+    requiere_session,
+    requiere_permiso({
+        read: {
+            medicos: ['*']
+        }
+    }),
+
+    param('id_medico')
+        .isInt()
+        .withMessage('El id_medico debe ser numérico'),
+
+    validarCampos,
+
+    medicosControlador.buscarPorId
 );
 
+/*GET /medicos/:id_medico/obras-sociales
+ * Obras sociales asociadas
+ */
 
-// AGREGAR
-router.post('/',
+router.get(
+    '/:id_medico/obras-sociales',
+    requiere_session,
+    requiere_permiso({
+        read: {
+            medicos: ['*']
+        }
+    }),
 
-    body('id_usuario')
-        .notEmpty().withMessage('El id_usuario es obligatorio'),
+    param('id_medico')
+        .isInt()
+        .withMessage('El id_medico debe ser numérico'),
+
+    validarCampos,
+
+    medicosControlador.buscarObrasSociales
+);
+
+/**POST /medicos/:id_medico/obras-sociales
+ * Asociar médico con obras sociales
+ */
+
+router.post(
+    '/:id_medico/obras-sociales',
+
+    requiere_session,
+
+    requiere_permiso({
+        add: {
+            medicos_obras_sociales: ['*']
+        }
+    }),
+
+    param('id_medico')
+        .isInt()
+        .withMessage('El id_medico debe ser numérico'),
+
+    body('obras_sociales')
+        .isArray()
+        .withMessage('obras_sociales debe ser un array'),
+
+    body('obras_sociales.*.id_obra_social')
+        .isInt()
+        .withMessage('id_obra_social debe ser numérico'),
+
+    validarCampos,
+
+    medicosControlador.asociarObrasSociales
+);
+
+/* PUT /medicos/:id_medico/especialidad
+ * Cambiar especialidad de un médico
+ */
+
+router.put(
+    '/:id_medico/especialidad',
+
+    requiere_session,
+
+    requiere_permiso({
+        edit: {
+            medicos: ['id_especialidad']
+        }
+    }),
+
+    param('id_medico')
+        .isInt()
+        .withMessage('El id_medico debe ser numérico'),
 
     body('id_especialidad')
-        .notEmpty().withMessage('La especialidad es obligatoria'),
+        .isInt()
+        .withMessage('id_especialidad debe ser numérico'),
 
-    body('matricula')
-        .notEmpty().withMessage('La matrícula es obligatoria'),
+    validarCampos,
 
-    body('valor_consulta')
-        .notEmpty().withMessage('El valor de consulta es obligatorio'),
-
-    agregarMedico
-);
-
-
-// ACTUALIZAR
-router.put('/:id',
-
-    body('id_especialidad')
-        .notEmpty().withMessage('La especialidad es obligatoria'),
-
-    body('matricula')
-        .notEmpty().withMessage('La matrícula es obligatoria'),
-
-    body('valor_consulta')
-        .notEmpty().withMessage('El valor de consulta es obligatorio'),
-
-    actualizarMedico
-);
-
-
-// ELIMINAR
-router.delete('/:id',
-    eliminarMedico
+    medicosControlador.actualizarEspecialidad
 );
 
 export default router;
