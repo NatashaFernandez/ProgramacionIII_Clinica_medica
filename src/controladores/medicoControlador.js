@@ -1,195 +1,158 @@
-import db from '../configuracion/db.js';
+import MedicosServicio from '../servicios/medicosServicio.js';
 
-// B - Browse: Listar todos los médicos
-export const listarMedicos = async (req, res) => {
-    try {
+export default class MedicosControlador {
 
-        const [results] = await db.query(`
-            SELECT 
-                m.id_medico,
-                m.matricula,
-                m.descripcion,
-                m.valor_consulta,
-                e.nombre AS especialidad,
-                u.apellido,
-                u.nombres,
-                u.email
-            FROM medicos m
-            INNER JOIN especialidades e 
-                ON m.id_especialidad = e.id_especialidad
-            INNER JOIN usuarios u
-                ON m.id_usuario = u.id_usuario
-            WHERE u.activo = 1
-        `);
-
-        res.status(200).json(results);
-
-    } catch (err) {
-
-        res.status(500).json({ error: err.message });
-
+    constructor() {
+        this.medicos = new MedicosServicio();
     }
-};
 
-// R - Read: Obtener médico por ID
-export const obtenerMedico = async (req, res) => {
+    buscarTodos = async (req, res) => {
 
-    try {
+        try {
 
-        const { id } = req.params;
+            const medicos = await this.medicos.buscarTodos();
 
-        const [results] = await db.query(`
-            SELECT 
-                m.id_medico,
-                m.matricula,
-                m.descripcion,
-                m.valor_consulta,
-                e.nombre AS especialidad,
-                u.apellido,
-                u.nombres,
-                u.email
-            FROM medicos m
-            INNER JOIN especialidades e 
-                ON m.id_especialidad = e.id_especialidad
-            INNER JOIN usuarios u
-                ON m.id_usuario = u.id_usuario
-            WHERE m.id_medico = ?
-            AND u.activo = 1
-        `, [id]);
-
-        if (results.length === 0) {
-            return res.status(404).json({
-                mensaje: 'Médico no encontrado'
+            res.status(200).json({
+                estado: true,
+                mensaje: 'Médicos encontrados',
+                medicos
             });
+
+        } catch (error) {
+
+            res.status(500).json({
+                estado: false,
+                mensaje: error.message
+            });
+
         }
+    };
 
-        res.status(200).json(results[0]);
+    buscarPorId = async (req, res) => {
 
-    } catch (err) {
+        try {
 
-        res.status(500).json({
-            error: err.message
-        });
+            const { id_medico } = req.params;
 
-    }
+            const medico = await this.medicos.buscarPorId(
+                id_medico
+            );
 
-};
+            if (!medico) {
+                return res.status(404).json({
+                    estado: false,
+                    mensaje: 'Médico no encontrado'
+                });
+            }
 
-// A - Add: Agregar médico
-export const agregarMedico = async (req, res) => {
+            res.status(200).json({
+                estado: true,
+                medico
+            });
 
-    try {
+        } catch (error) {
 
-        const {
-            id_usuario,
-            id_especialidad,
-            matricula,
-            descripcion,
-            valor_consulta
-        } = req.body;
+            res.status(500).json({
+                estado: false,
+                mensaje: error.message
+            });
 
-        const [results] = await db.query(`
-            INSERT INTO medicos
-            (
-                id_usuario,
-                id_especialidad,
-                matricula,
-                descripcion,
-                valor_consulta
-            )
-            VALUES (?, ?, ?, ?, ?)
-        `, [
-            id_usuario,
-            id_especialidad,
-            matricula,
-            descripcion,
-            valor_consulta
-        ]);
+        }
+    };
 
-        res.status(201).json({
-            mensaje: 'Médico agregado correctamente',
-            id: results.insertId
-        });
+    buscarObrasSociales = async (req, res) => {
 
-    } catch (err) {
+        try {
 
-        res.status(500).json({
-            error: err.message
-        });
+            const { id_medico } = req.params;
 
-    }
+            const obras =
+                await this.medicos.buscarObrasSociales(
+                    id_medico
+                );
 
-};
+            res.status(200).json({
+                estado: true,
+                obras_sociales: obras
+            });
 
-// E - Edit: Actualizar médico
-export const actualizarMedico = async (req, res) => {
+        } catch (error) {
 
-    try {
+            res.status(500).json({
+                estado: false,
+                mensaje: error.message
+            });
 
-        const { id } = req.params;
+        }
+    };
 
-        const {
-            id_especialidad,
-            matricula,
-            descripcion,
-            valor_consulta
-        } = req.body;
+    asociarObrasSociales = async (req, res) => {
 
-        await db.query(`
-            UPDATE medicos
-            SET
-                id_especialidad = ?,
-                matricula = ?,
-                descripcion = ?,
-                valor_consulta = ?
-            WHERE id_medico = ?
-        `, [
-            id_especialidad,
-            matricula,
-            descripcion,
-            valor_consulta,
-            id
-        ]);
+        try {
 
-        res.status(200).json({
-            mensaje: 'Médico actualizado correctamente'
-        });
+            const { id_medico } = req.params;
+            const { obras_sociales } = req.body;
 
-    } catch (err) {
+            const relacion =
+                await this.medicos.asociarObrasSociales(
+                    id_medico,
+                    obras_sociales
+                );
 
-        res.status(500).json({
-            error: err.message
-        });
+            if (!relacion) {
+                return res.status(400).json({
+                    estado: false,
+                    mensaje: 'No fue posible asociar las obras sociales'
+                });
+            }
 
-    }
+            res.status(201).json({
+                estado: true,
+                mensaje: 'Relaciones creadas correctamente'
+            });
 
-};
+        } catch (error) {
 
-// D - Delete: Borrado lógico
-export const eliminarMedico = async (req, res) => {
+            res.status(500).json({
+                estado: false,
+                mensaje: error.message
+            });
 
-    try {
+        }
+    };
 
-        const { id } = req.params;
+    actualizarEspecialidad = async (req, res) => {
 
-        await db.query(`
-            UPDATE usuarios u
-            INNER JOIN medicos m
-                ON u.id_usuario = m.id_usuario
-            SET u.activo = 0
-            WHERE m.id_medico = ?
-        `, [id]);
+        try {
 
-        res.status(202).json({
-            mensaje: 'Médico eliminado correctamente'
-        });
+            const { id_medico } = req.params;
+            const { id_especialidad } = req.body;
 
-    } catch (err) {
+            const actualizado =
+                await this.medicos.actualizarEspecialidad(
+                    id_medico,
+                    id_especialidad
+                );
 
-        res.status(500).json({
-            error: err.message
-        });
+            if (!actualizado) {
+                return res.status(404).json({
+                    estado: false,
+                    mensaje: 'Médico no encontrado'
+                });
+            }
 
-    }
+            res.status(200).json({
+                estado: true,
+                mensaje: 'Especialidad actualizada correctamente'
+            });
 
-};
+        } catch (error) {
+
+            res.status(500).json({
+                estado: false,
+                mensaje: error.message
+            });
+
+        }
+    };
+}
