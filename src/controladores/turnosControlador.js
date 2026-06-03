@@ -88,9 +88,16 @@ export const crearTurno = async (req, res) => {
             ]
         );
 
+        const [turnoCreado] = await db.query(
+            `SELECT *
+             FROM turnos_reservas
+             WHERE id_turno_reserva = ?`,
+            [resultado.insertId]
+        );
+
         res.status(201).json({
             mensaje: 'Turno reservado correctamente',
-            id: resultado.insertId
+            turno: turnoCreado[0]
         });
 
     } catch (error) {
@@ -191,9 +198,16 @@ export const crearTurnoAdmin = async (req, res) => {
             ]
         );
 
+        const [turnoCreado] = await db.query(
+            `SELECT *
+             FROM turnos_reservas
+             WHERE id_turno_reserva = ?`,
+            [resultado.insertId]
+        );
+
         res.status(201).json({
             mensaje: 'Turno creado por administrador',
-            id: resultado.insertId
+            turno: turnoCreado[0]
         });
 
     } catch (error) {
@@ -280,7 +294,6 @@ export const marcarAtendido = async (req, res) => {
 
         const { id } = req.params;
 
-        // Verificar turno
         const [turno] = await db.query(
             `SELECT *
              FROM turnos_reservas
@@ -304,8 +317,16 @@ export const marcarAtendido = async (req, res) => {
             [id]
         );
 
+        const [turnoActualizado] = await db.query(
+            `SELECT *
+             FROM turnos_reservas
+             WHERE id_turno_reserva = ?`,
+            [id]
+        );
+
         res.status(200).json({
-            mensaje: 'Turno marcado como atendido'
+            mensaje: 'Turno marcado como atendido',
+            turno: turnoActualizado[0]
         });
 
     } catch (error) {
