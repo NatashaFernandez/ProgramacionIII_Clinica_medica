@@ -16,8 +16,13 @@ app.use(express.json());
 //MIDDLEWARE Morgan "observa"
 app.use(morgan('dev'));
 
-// RUTA DE ESPECIALIDADES
+// RUTAs sin versionado
+// rutas protegida
 app.use('/especialidades', especialidadesRutas);
+app.use('/medicos', requiere_session, medicosRutas);
+// RUTAS VERSIONADAS V1
+app.use('/api/v1/medicos', requiere_session, medicosRutas);
+
 
 // Ruta raíz (Bienvenida)
 app.get('/', (req, res) => {
