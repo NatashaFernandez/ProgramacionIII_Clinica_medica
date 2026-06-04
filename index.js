@@ -7,6 +7,7 @@ import morgan from 'morgan';
 
 // Importación de rutas 
 import especialidadesRutas from './src/rutas/especialidadesRutas.js';
+import medicosRutas from './src/rutas/medicosRutas.js';
 
 const app = express();
 
