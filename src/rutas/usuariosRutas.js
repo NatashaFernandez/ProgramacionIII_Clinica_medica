@@ -5,6 +5,70 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 import { requiere_session } from '../middlewares/requiere_session.js';
 import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
+/**
+ * @swagger
+ * /usuarios:
+ *   get:
+ *     summary: Listar usuarios activos
+ *     tags:
+ *       - Usuarios
+ *     responses:
+ *       200:
+ *         description: Lista de usuarios
+ */
+
+/**
+ * @swagger
+ * /usuarios/{id}:
+ *   get:
+ *     summary: Obtener usuario por ID
+ *     tags:
+ *       - Usuarios
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Usuario encontrado
+ */
+
+/**
+ * @swagger
+ * /usuarios:
+ *   post:
+ *     summary: Registrar usuario
+ *     tags:
+ *       - Usuarios
+ *     responses:
+ *       201:
+ *         description: Usuario creado
+ */
+
+/**
+ * @swagger
+ * /usuarios/{id}:
+ *   put:
+ *     summary: Actualizar usuario
+ *     tags:
+ *       - Usuarios
+ *     responses:
+ *       200:
+ *         description: Usuario actualizado
+ */
+
+/**
+ * @swagger
+ * /usuarios/{id}:
+ *   delete:
+ *     summary: Baja lógica de usuario
+ *     tags:
+ *       - Usuarios
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado
+ */
+
 const router = Router();
 
 // 1. Listar Usuarios (Browse)

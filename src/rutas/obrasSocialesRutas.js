@@ -10,6 +10,51 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 import { body } from 'express-validator';
 import { validarCampos } from '../middlewares/validar_campos.js';
 
+/**
+ * @swagger
+ * /obras_sociales:
+ *   get:
+ *     summary: Listar obras sociales
+ *     tags:
+ *       - Obras Sociales
+ */
+
+/**
+ * @swagger
+ * /obras_sociales/{id}:
+ *   get:
+ *     summary: Obtener obra social por ID
+ *     tags:
+ *       - Obras Sociales
+ */
+
+/**
+ * @swagger
+ * /obras_sociales:
+ *   post:
+ *     summary: Crear obra social
+ *     tags:
+ *       - Obras Sociales
+ */
+
+/**
+ * @swagger
+ * /obras_sociales/{id}:
+ *   put:
+ *     summary: Actualizar obra social
+ *     tags:
+ *       - Obras Sociales
+ */
+
+/**
+ * @swagger
+ * /obras_sociales/{id}:
+ *   delete:
+ *     summary: Eliminar obra social
+ *     tags:
+ *       - Obras Sociales
+ */
+
 const router = express.Router();
 
 router.get('/', requiere_permiso({ browse: { obras_sociales: ["*"] } }), listarObrasSociales);
