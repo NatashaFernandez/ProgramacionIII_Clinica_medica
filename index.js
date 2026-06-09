@@ -12,6 +12,7 @@ import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
 import authRutas from './src/rutas/authRutas.js';
 import usuariosRutas from './src/rutas/usuariosRutas.js';
 import turnosRutas from './src/rutas/turnosRutas.js';
+import observacionesMedicasRutas from './src/rutas/observacionesMedicasRutas.js';
 
 const app = express();
 
@@ -44,11 +45,15 @@ app.use('/turnos', requiere_session, turnosRutas);
 // Públicas
 app.use('/api/v1/auth', authRutas);
 app.use('/api/v1/usuarios', usuariosRutas);
+app.use('/api/v1/observaciones',requiere_session,observacionesMedicasRutas);
 
 // Protegidas
 app.use('/api/v1/especialidades', requiere_session, especialidadesRutas);
 app.use('/api/v1/obras_sociales', requiere_session, obrasSocialesRutas);
 app.use('/api/v1/turnos', requiere_session, turnosRutas);
+app.use( '/observaciones',requiere_session, observacionesMedicasRutas);
+
+
 
 // Ruta raíz
 app.get('/', (req, res) => {
