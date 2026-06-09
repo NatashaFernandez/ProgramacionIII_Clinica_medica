@@ -1,12 +1,12 @@
-import db from '../configuracion/db.js';
+import EspecialidadesServicio from '../servicios/especialidadesServicio.js';
+
+const especialidadesServicio = new EspecialidadesServicio();
 
 // B - Browse: Listar todas
 export const listarEspecialidades = async (req, res) => {
     try {
 
-        const [results] = await db.query(
-            'SELECT * FROM especialidades WHERE activo = 1'
-        );
+        const results = await especialidadesServicio.listar();
 
         res.status(200).json(results);
 
@@ -25,12 +25,9 @@ export const obtenerEspecialidad = async (req, res) => {
 
         const { id } = req.params;
 
-        const [results] = await db.query(
-            'SELECT * FROM especialidades WHERE id_especialidad = ? AND activo = 1',
-            [id]
-        );
+        const especialidad = await especialidadesServicio.obtenerPorId(id);
 
-        if (results.length === 0) {
+        if (!especialidad) {
 
             return res.status(404).json({
                 mensaje: 'Especialidad no encontrada'
@@ -38,7 +35,7 @@ export const obtenerEspecialidad = async (req, res) => {
 
         }
 
-        res.status(200).json(results[0]);
+        res.status(200).json(especialidad);
 
     } catch (err) {
 
@@ -56,19 +53,14 @@ export const actualizarEspecialidad = async (req, res) => {
         const { id } = req.params;
         const { nombre } = req.body;
 
-        await db.query(
-            'UPDATE especialidades SET nombre = ? WHERE id_especialidad = ?',
-            [nombre, id]
-        );
-
-        const [especialidad] = await db.query(
-            'SELECT * FROM especialidades WHERE id_especialidad = ?',
-            [id]
+        const especialidad = await especialidadesServicio.actualizar(
+            id,
+            nombre
         );
 
         res.status(200).json({
             mensaje: 'Especialidad actualizada correctamente',
-            especialidad: especialidad[0]
+            especialidad
         });
 
     } catch (err) {
@@ -86,19 +78,11 @@ export const agregarEspecialidad = async (req, res) => {
 
         const { nombre } = req.body;
 
-        const [results] = await db.query(
-            'INSERT INTO especialidades (nombre) VALUES (?)',
-            [nombre]
-        );
-
-        const [especialidad] = await db.query(
-            'SELECT * FROM especialidades WHERE id_especialidad = ?',
-            [results.insertId]
-        );
+        const especialidad = await especialidadesServicio.agregar(nombre);
 
         res.status(201).json({
             mensaje: 'Especialidad agregada con éxito',
-            especialidad: especialidad[0]
+            especialidad
         });
 
     } catch (err) {
@@ -116,10 +100,7 @@ export const eliminarEspecialidad = async (req, res) => {
 
         const { id } = req.params;
 
-        await db.query(
-            'UPDATE especialidades SET activo = 0 WHERE id_especialidad = ?',
-            [id]
-        );
+        await especialidadesServicio.eliminar(id);
 
         res.status(202).json({
             mensaje: 'Especialidad eliminada (desactivada)',

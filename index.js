@@ -4,19 +4,15 @@ process.loadEnvFile();
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
-
 import { requiere_session } from './src/middlewares/requiere_session.js';
-
-import swaggerUi from 'swagger-ui-express';
-import swaggerSpec from './src/configuracion/swagger.js';
 
 // Importación de rutas
 import authRutas from './src/rutas/authRutas.js';
 import usuariosRutas from './src/rutas/usuariosRutas.js';
 import especialidadesRutas from './src/rutas/especialidadesRutas.js';
 import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
-import pacientesRutas from './src/rutas/pacientesRutas.js';
 import turnosRutas from './src/rutas/turnosRutas.js';
+import observacionesMedicasRutas from './src/rutas/observacionesMedicasRutas.js';
 import medicosRutas from './src/rutas/medicosRutas.js';
 
 const app = express();
@@ -30,7 +26,6 @@ app.use(express.json());
 // MIDDLEWARE Morgan
 app.use(morgan('dev'));
 
-
 // ====================
 // RUTAS SIN VERSIONADO
 // ====================
@@ -42,10 +37,8 @@ app.use('/usuarios', usuariosRutas);
 // Protegidas
 app.use('/especialidades', requiere_session, especialidadesRutas);
 app.use('/obras_sociales', requiere_session, obrasSocialesRutas);
-app.use('/pacientes', requiere_session, pacientesRutas);
 app.use('/turnos', requiere_session, turnosRutas);
 app.use('/medicos', requiere_session, medicosRutas);
-
 
 // ====================
 // RUTAS VERSIONADAS V1
@@ -54,19 +47,16 @@ app.use('/medicos', requiere_session, medicosRutas);
 // Públicas
 app.use('/api/v1/auth', authRutas);
 app.use('/api/v1/usuarios', usuariosRutas);
+app.use('/api/v1/observaciones', requiere_session, observacionesMedicasRutas);
 
 // Protegidas
 app.use('/api/v1/especialidades', requiere_session, especialidadesRutas);
 app.use('/api/v1/obras_sociales', requiere_session, obrasSocialesRutas);
-app.use('/api/v1/pacientes', requiere_session, pacientesRutas);
 app.use('/api/v1/turnos', requiere_session, turnosRutas);
 app.use('/api/v1/medicos', requiere_session, medicosRutas);
+app.use('/observaciones', requiere_session, observacionesMedicasRutas);
 
-
-// ====================
-// RUTA RAÍZ
-// ====================
-
+// Ruta raíz
 app.get('/', (req, res) => {
     res.status(200).json({
         api: "Clínica Grupo AC",
@@ -78,26 +68,11 @@ app.get('/', (req, res) => {
             "Especialidades",
             "Obras Sociales",
             "Médicos",
-            "Turnos"
+            "Turnos",
+            "Observaciones Médicas"
         ]
     });
 });
-
-
-// ====================
-// SWAGGER
-// ====================
-
-app.use(
-    '/api-docs',
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec)
-);
-
-
-// ====================
-// SERVIDOR
-// ====================
 
 const PORT = process.env.PUERTO || 3000;
 
