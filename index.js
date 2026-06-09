@@ -15,6 +15,7 @@ import authRutas from './src/rutas/authRutas.js';
 import usuariosRutas from './src/rutas/usuariosRutas.js';
 import especialidadesRutas from './src/rutas/especialidadesRutas.js';
 import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
+import pacientesRutas from './src/rutas/pacientesRutas.js';
 import turnosRutas from './src/rutas/turnosRutas.js';
 import medicosRutas from './src/rutas/medicosRutas.js';
 
@@ -41,6 +42,7 @@ app.use('/usuarios', usuariosRutas);
 // Protegidas
 app.use('/especialidades', requiere_session, especialidadesRutas);
 app.use('/obras_sociales', requiere_session, obrasSocialesRutas);
+app.use('/pacientes', requiere_session, pacientesRutas);
 app.use('/turnos', requiere_session, turnosRutas);
 app.use('/medicos', requiere_session, medicosRutas);
 
@@ -56,6 +58,7 @@ app.use('/api/v1/usuarios', usuariosRutas);
 // Protegidas
 app.use('/api/v1/especialidades', requiere_session, especialidadesRutas);
 app.use('/api/v1/obras_sociales', requiere_session, obrasSocialesRutas);
+app.use('/api/v1/pacientes', requiere_session, pacientesRutas);
 app.use('/api/v1/turnos', requiere_session, turnosRutas);
 app.use('/api/v1/medicos', requiere_session, medicosRutas);
 
