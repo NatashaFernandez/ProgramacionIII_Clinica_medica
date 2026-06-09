@@ -10,6 +10,54 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 import { body } from 'express-validator';
 import { validarCampos } from '../middlewares/validar_campos.js';
 
+/**
+ * @swagger
+ * /especialidades:
+ *   get:
+ *     summary: Listar especialidades
+ *     tags:
+ *       - Especialidades
+ *     responses:
+ *       200:
+ *         description: Lista de especialidades
+ */
+
+/**
+ * @swagger
+ * /especialidades/{id}:
+ *   get:
+ *     summary: Obtener especialidad por ID
+ *     tags:
+ *       - Especialidades
+ */
+
+/**
+ * @swagger
+ * /especialidades:
+ *   post:
+ *     summary: Crear especialidad
+ *     tags:
+ *       - Especialidades
+ */
+
+/**
+ * @swagger
+ * /especialidades/{id}:
+ *   put:
+ *     summary: Actualizar especialidad
+ *     tags:
+ *       - Especialidades
+ */
+
+/**
+ * @swagger
+ * /especialidades/{id}:
+ *   delete:
+ *     summary: Eliminar especialidad
+ *     tags:
+ *       - Especialidades
+ */
+
 
 const router = express.Router();
 

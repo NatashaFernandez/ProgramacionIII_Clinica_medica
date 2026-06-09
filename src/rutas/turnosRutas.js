@@ -78,4 +78,60 @@ router.put('/:id/atentido',
     marcarAtendido
 );
 
+/**
+ * @swagger
+ * /turnos/mis-turnos:
+ *   get:
+ *     summary: Obtiene los turnos del usuario autenticado
+ *     tags:
+ *       - Turnos
+ *     responses:
+ *       200:
+ *         description: Lista de turnos
+ */
+
+/**
+ * @swagger
+ * /turnos:
+ *   post:
+ *     summary: Crear turno propio
+ *     tags:
+ *       - Turnos
+ */
+
+/**
+ * @swagger
+ * /turnos/admin:
+ *   post:
+ *     summary: Crear turno como administrador
+ *     tags:
+ *       - Turnos
+ */
+
+/**
+ * @swagger
+ * /turnos/mis-turnos:
+ *   get:
+ *     summary: Listar mis turnos
+ *     tags:
+ *       - Turnos
+ */
+
+/**
+ * @swagger
+ * /turnos/{id}/atentido:
+ *   put:
+ *     summary: Marcar turno como atendido
+ *     tags:
+ *       - Turnos
+ */
+
+router.get(
+    '/mis-turnos',
+    requiere_permiso({
+        browse: { turnos: ['owned'] }
+    }),
+    listarMisTurnos
+);
+
 export default router;

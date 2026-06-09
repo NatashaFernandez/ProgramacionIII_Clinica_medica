@@ -7,12 +7,13 @@ import morgan from 'morgan';
 import { requiere_session } from './src/middlewares/requiere_session.js';
 
 // Importación de rutas
-import especialidadesRutas from './src/rutas/especialidadesRutas.js';
-import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
 import authRutas from './src/rutas/authRutas.js';
 import usuariosRutas from './src/rutas/usuariosRutas.js';
+import especialidadesRutas from './src/rutas/especialidadesRutas.js';
+import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
 import turnosRutas from './src/rutas/turnosRutas.js';
 import observacionesMedicasRutas from './src/rutas/observacionesMedicasRutas.js';
+import medicosRutas from './src/rutas/medicosRutas.js';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/usuarios', usuariosRutas);
 app.use('/especialidades', requiere_session, especialidadesRutas);
 app.use('/obras_sociales', requiere_session, obrasSocialesRutas);
 app.use('/turnos', requiere_session, turnosRutas);
+app.use('/medicos', requiere_session, medicosRutas);
 
 // ====================
 // RUTAS VERSIONADAS V1
@@ -45,15 +47,14 @@ app.use('/turnos', requiere_session, turnosRutas);
 // Públicas
 app.use('/api/v1/auth', authRutas);
 app.use('/api/v1/usuarios', usuariosRutas);
-app.use('/api/v1/observaciones',requiere_session,observacionesMedicasRutas);
+app.use('/api/v1/observaciones', requiere_session, observacionesMedicasRutas);
 
 // Protegidas
 app.use('/api/v1/especialidades', requiere_session, especialidadesRutas);
 app.use('/api/v1/obras_sociales', requiere_session, obrasSocialesRutas);
 app.use('/api/v1/turnos', requiere_session, turnosRutas);
-app.use( '/observaciones',requiere_session, observacionesMedicasRutas);
-
-
+app.use('/api/v1/medicos', requiere_session, medicosRutas);
+app.use('/observaciones', requiere_session, observacionesMedicasRutas);
 
 // Ruta raíz
 app.get('/', (req, res) => {
@@ -67,7 +68,8 @@ app.get('/', (req, res) => {
             "Especialidades",
             "Obras Sociales",
             "Médicos",
-            "Turnos"
+            "Turnos",
+            "Observaciones Médicas"
         ]
     });
 });

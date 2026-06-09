@@ -5,6 +5,18 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Iniciar sesión
+ *     tags:
+ *       - Auth
+ *     responses:
+ *       200:
+ *         description: Login exitoso
+ */
+
 router.post('/login',
     // VALIDACIONES
     body('email')
