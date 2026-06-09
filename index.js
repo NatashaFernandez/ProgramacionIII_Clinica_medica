@@ -5,6 +5,8 @@ import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
 import { requiere_session } from './src/middlewares/requiere_session.js';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './src/configuracion/swagger.js';
 
 // Importación de rutas
 import authRutas from './src/rutas/authRutas.js';
@@ -73,6 +75,14 @@ app.get('/', (req, res) => {
         ]
     });
 });
+
+// Documentacion Swagger
+
+app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec)
+);
 
 const PORT = process.env.PUERTO || 3000;
 
