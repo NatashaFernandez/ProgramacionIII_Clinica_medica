@@ -26,6 +26,20 @@ export default class MedicosServicio {
 
         return new MedicosRespuestaDTO(medico);
     };
+        
+    buscarPorEspecialidad = async (
+    id_especialidad
+) => {
+
+    const datos =
+        await this.medicos.buscarPorEspecialidad(
+            id_especialidad
+        );
+
+    return datos.map(
+        medico => new MedicosRespuestaDTO(medico)
+    );
+};
 
     buscarObrasSociales = async (id_medico) => {
         return await this.medicos.buscarObrasSociales(id_medico);
