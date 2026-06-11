@@ -1,6 +1,7 @@
 import db from '../configuracion/db.js';
 
 import Turnos from '../db/turnos.js';
+import { calcularValorTotal } from '../servicios/turnosServicio.js';
 import TurnoRespuestaDTO from '../dto/TurnoRespuestaDTO.js';
 
 const turnosDB = new Turnos();
@@ -42,6 +43,21 @@ export const crearTurno = async (req, res) => {
             });
         }
 
+        const medico =
+         await turnosDB.obtenerMedico(
+            id_medico
+        );
+
+        const obraSocial =
+        await turnosDB.obtenerObraSocial(
+            paciente.id_obra_social
+        );
+        
+        const valorTotal = calcularValorTotal(
+        medico.valor_consulta,
+        obraSocial.porcentaje_descuento,
+        obraSocial.es_particular);
+
         const ocupado =
             await turnosDB.turnoOcupado(
                 fecha_hora,
@@ -68,13 +84,13 @@ export const crearTurno = async (req, res) => {
             )
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
-                id_medico,
-                paciente.id_paciente,
-                paciente.id_obra_social,
-                fecha_hora,
-                0,
-                0,
-                1
+            id_medico,
+            paciente.id_paciente,
+            paciente.id_obra_social,
+            fecha_hora,
+            valorTotal,
+            0,
+             1
             ]
         );
 
@@ -138,6 +154,21 @@ export const crearTurnoAdmin = async (
                 error: 'Paciente no encontrado'
             });
         }
+        const medico =
+            await turnosDB.obtenerMedico(
+                id_medico
+            );
+
+        const obraSocial =
+             await turnosDB.obtenerObraSocial(
+                paciente.id_obra_social
+            );
+
+        const valorTotal = calcularValorTotal(
+                 medico.valor_consulta,
+                obraSocial.porcentaje_descuento,
+                obraSocial.es_particular
+            );
 
         const ocupado =
             await turnosDB.turnoOcupado(
@@ -164,12 +195,13 @@ export const crearTurnoAdmin = async (
                 activo
             )
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        
             [
                 id_medico,
                 id_paciente,
                 paciente.id_obra_social,
                 fecha_hora,
-                0,
+                valorTotal,
                 0,
                 1
             ]
@@ -242,8 +274,24 @@ export const listarMisTurnos = async (
             `;
 
             values = [id_usuario];
+            
+        }else if (rol === 3) {
 
-        } else {
+    const [resultados] = await db.query(`
+        SELECT *
+        FROM turnos_reservas
+        WHERE activo = 1
+    `);
+
+    return res.status(200).json(
+        resultados.map(
+            turno => new TurnoRespuestaDTO(turno)
+        )
+    );
+
+} 
+
+         else {
 
             return res.status(403).json({
                 error:
