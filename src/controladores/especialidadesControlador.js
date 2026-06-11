@@ -1,66 +1,117 @@
-import db from '../configuracion/db.js';
+import EspecialidadesServicio from '../servicios/especialidadesServicio.js';
+
+const especialidadesServicio = new EspecialidadesServicio();
 
 // B - Browse: Listar todas
 export const listarEspecialidades = async (req, res) => {
     try {
-        const [results] = await db.query('SELECT * FROM especialidades WHERE activo = 1');
-        res.status(200).json(results); // 200: OK
+
+        const results = await especialidadesServicio.listar();
+
+        res.status(200).json(results);
+
     } catch (err) {
-        res.status(500).json({ error: err.message }); // 500: Error de servidor
+
+        res.status(500).json({
+            error: err.message
+        });
+
     }
 };
 
 // R - Read: Obtener una sola por ID
 export const obtenerEspecialidad = async (req, res) => {
     try {
+
         const { id } = req.params;
-        const [results] = await db.query('SELECT * FROM especialidades WHERE id_especialidad = ? AND activo = 1', [id]);
-        
-        if (results.length === 0) {
-            return res.status(404).json({ mensaje: 'Especialidad no encontrada' }); // 404: No existe
+
+        const especialidad = await especialidadesServicio.obtenerPorId(id);
+
+        if (!especialidad) {
+
+            return res.status(404).json({
+                mensaje: 'Especialidad no encontrada'
+            });
+
         }
-        
-        res.status(200).json(results[0]);
+
+        res.status(200).json(especialidad);
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            error: err.message
+        });
+
     }
 };
 
 // E - Edit: Actualizar datos
 export const actualizarEspecialidad = async (req, res) => {
     try {
+
         const { id } = req.params;
         const { nombre } = req.body;
-        await db.query('UPDATE especialidades SET nombre = ? WHERE id_especialidad = ?', [nombre, id]);
-        
-        res.status(200).json({ mensaje: 'Especialidad actualizada correctamente' }); // 200: Éxito
+
+        const especialidad = await especialidadesServicio.actualizar(
+            id,
+            nombre
+        );
+
+        res.status(200).json({
+            mensaje: 'Especialidad actualizada correctamente',
+            especialidad
+        });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            error: err.message
+        });
+
     }
 };
 
 // A - Add: Agregar una
 export const agregarEspecialidad = async (req, res) => {
     try {
+
         const { nombre } = req.body;
-        const [results] = await db.query('INSERT INTO especialidades (nombre) VALUES (?)', [nombre]);
-        
-        // 201: Creado (Es el código correcto para un POST exitoso)
-        res.status(201).json({ mensaje: 'Especialidad agregada con éxito', id: results.insertId });
+
+        const especialidad = await especialidadesServicio.agregar(nombre);
+
+        res.status(201).json({
+            mensaje: 'Especialidad agregada con éxito',
+            especialidad
+        });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            error: err.message
+        });
+
     }
 };
 
 // D - Delete: Borrado lógico
 export const eliminarEspecialidad = async (req, res) => {
     try {
+
         const { id } = req.params;
-        await db.query('UPDATE especialidades SET activo = 0 WHERE id_especialidad = ?', [id]);
-        
-        // 202: Aceptado (Se usa mucho para indicar que la petición se aceptó y procesó)
-        res.status(202).json({ mensaje: 'Especialidad eliminada (desactivada)' });
+
+        await especialidadesServicio.eliminar(id);
+
+        res.status(202).json({
+            mensaje: 'Especialidad eliminada (desactivada)',
+            id_especialidad: id
+        });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            error: err.message
+        });
+
     }
 };

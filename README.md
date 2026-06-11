@@ -119,7 +119,7 @@ próximo turno a llamar.
 
 ************************************************************ENTREGA DE AVANCES 8-5-2026********************************************************************
 
-iNTEGRANTE: SOLANGE BLANC
+iNTEGRANTE: SOLANGE BLANC- YANINA GALVAN
 Tareas realizadas:
 Inicialización del proyecto: Configuración de la estructura de carpetas y entorno Node.js. 
 Arquitectura: Implementación de módulos ES6 (import/export) y gestión de variables de entorno con .env. 
@@ -139,5 +139,17 @@ INTEGRANTE: IVONNE FERNÁNDEZ
 
 INTEGRANTE: NATASHA FERNÁNDEZ
 
-INTEGRANTE: YANINA GALVÁN
+#####ENTREGA FINAL###########
+INTEGRANTES: 
+###SOLANGE BLANC####
+
+###YANINA GALVÁN#####
+
+###IVONNE FERNÁNDEZ###
+
+###NATASHA FERNÁNDEZ###
+
+
+
+
 

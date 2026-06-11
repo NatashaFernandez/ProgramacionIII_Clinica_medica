@@ -5,6 +5,122 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 import { requiere_session } from '../middlewares/requiere_session.js';
 import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
+/**
+ * @swagger
+ * /medicos:
+ *   get:
+ *     summary: Obtener todos los médicos
+ *     tags: [Médicos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de médicos
+ */
+
+/**
+ * @swagger
+ * /medicos/{id_medico}:
+ *   get:
+ *     summary: Obtener un médico por ID
+ *     tags: [Médicos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_medico
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Médico encontrado
+ *       404:
+ *         description: Médico no encontrado
+ */
+
+/**
+ * @swagger
+ * /medicos/{id_medico}/obras-sociales:
+ *   get:
+ *     summary: Obtener obras sociales asociadas a un médico
+ *     tags: [Médicos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_medico
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Obras sociales encontradas
+ */
+
+/**
+ * @swagger
+ * /medicos/{id_medico}/obras-sociales:
+ *   post:
+ *     summary: Asociar obras sociales a un médico
+ *     tags: [Médicos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_medico
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               obras_sociales:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id_obra_social:
+ *                       type: integer
+ *     responses:
+ *       201:
+ *         description: Relaciones creadas correctamente
+ */
+
+/**
+ * @swagger
+ * /medicos/{id_medico}/especialidad:
+ *   put:
+ *     summary: Actualizar especialidad de un médico
+ *     tags: [Médicos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_medico
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id_especialidad:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Especialidad actualizada correctamente
+ */
+
+
+
 const router = express.Router();
 
 const medicosControlador = new MedicosControlador();

@@ -1,5 +1,5 @@
 import Medicos from '../db/medicos.js';
-import MedicosRespuestaDTO from '../dtos/MedicosRespuestaDTO.js';
+import MedicosRespuestaDTO from '../dto/MedicosRespuestaDTO.js';
 
 export default class MedicosServicio {
 
