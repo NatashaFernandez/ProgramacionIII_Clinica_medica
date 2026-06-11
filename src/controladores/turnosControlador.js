@@ -174,6 +174,25 @@ export const crearTurnoAdmin = async (req, res) => {
 
         }
 
+        // Obtener datos de la obra social
+const [obraSocial] = await db.query(
+    `SELECT porcentaje_descuento, es_particular
+     FROM obras_sociales
+     WHERE id_obra_social = ?`,
+    [id_obra_social]
+);
+
+let valor_total = Number(medico[0].valor_consulta);
+
+if (
+    obraSocial.length > 0 &&
+    obraSocial[0].es_particular === 0
+) {
+    valor_total =
+        valor_total -
+        (valor_total * Number(obraSocial[0].porcentaje_descuento) / 100);
+}
+
         // Crear turno
         const [resultado] = await db.query(
             `INSERT INTO turnos_reservas
@@ -187,15 +206,15 @@ export const crearTurnoAdmin = async (req, res) => {
                 activo
             )
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [
-                id_medico,
-                id_paciente,
-                id_obra_social,
-                fecha_hora,
-                0,
-                0,
-                1
-            ]
+          [
+    id_medico,
+    id_paciente,
+    id_obra_social,
+    fecha_hora,
+    valor_total,
+    0,
+    1
+]
         );
 
         const [turnoCreado] = await db.query(
