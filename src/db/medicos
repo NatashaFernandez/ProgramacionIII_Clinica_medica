@@ -58,6 +58,39 @@ export default class Medicos {
         return medico[0];
     };
 
+buscarPorEspecialidad = async (id_especialidad) => {
+
+    const sql = `
+        SELECT
+            m.id_medico,
+            m.id_usuario,
+            u.apellido,
+            u.nombres,
+            u.email,
+            u.foto_path,
+            e.id_especialidad,
+            e.nombre AS especialidad,
+            m.matricula,
+            m.descripcion,
+            m.valor_consulta
+        FROM medicos m
+        INNER JOIN usuarios u
+            ON m.id_usuario = u.id_usuario
+        INNER JOIN especialidades e
+            ON m.id_especialidad = e.id_especialidad
+        WHERE e.id_especialidad = ?
+          AND u.activo = 1
+    `;
+
+    const [medicos] = await db.query(
+        sql,
+        [id_especialidad]
+    );
+
+    return medicos;
+};
+
+
     buscarObrasSociales = async (id_medico) => {
 
         const sql = `
