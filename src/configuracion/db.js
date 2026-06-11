@@ -9,9 +9,12 @@ const pool = mysql.createPool({
     port: process.env.DB_PUERTO,
     password: process.env.DB_CONTRASENA,
     database: process.env.DB_NOMBRE,
+    timezone: '-03:00',
     ssl: process.env.HABILITAR_SSL === 'true' ? {
         minVersion: 'TLSv1.2',
-        ca: process.env.RUTA_CA_CERTIFICADO ? fs.readFileSync(process.env.RUTA_CA_CERTIFICADO) : undefined
+        ca: process.env.RUTA_CA_CERTIFICADO
+            ? fs.readFileSync(process.env.RUTA_CA_CERTIFICADO)
+            : undefined
     } : null,
 });
 
