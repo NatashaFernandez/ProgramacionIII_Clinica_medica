@@ -138,6 +138,31 @@ router.get(
     medicosControlador.buscarTodos
 );
 
+// Listar médicos por especialidad
+
+router.get(
+    '/especialidad/:id_especialidad',
+
+    requiere_session,
+
+    requiere_permiso({
+        browse: {
+            medicos: ['*']
+        }
+    }),
+
+    param('id_especialidad')
+        .isInt()
+        .withMessage(
+            'El id_especialidad debe ser numérico'
+        ),
+
+    validarCampos,
+
+    medicosControlador.buscarPorEspecialidad
+);
+
+
 //Obtener médico por ID
 
 router.get(
