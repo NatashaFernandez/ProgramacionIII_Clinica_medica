@@ -1,70 +1,76 @@
 import db from '../configuracion/db.js';
 
+import Turnos from '../db/turnos.js';
+import { calcularValorTotal } from '../servicios/turnosServicio.js';
+import TurnoRespuestaDTO from '../dto/TurnoRespuestaDTO.js';
+
+const turnosDB = new Turnos();
+
 
 // PACIENTE - Crear reserva propia
 export const crearTurno = async (req, res) => {
 
     try {
 
-        const { fecha_hora, id_medico } = req.body;
+        const {
+            fecha_hora,
+            id_medico
+        } = req.body;
 
-        // Usuario logueado desde JWT
         const id_usuario = req.user.id;
 
-        // Buscar paciente asociado al usuario
-        const [paciente] = await db.query(
-            `SELECT id_paciente, id_obra_social
-             FROM pacientes
-             WHERE id_usuario = ?`,
-            [id_usuario]
-        );
+        const paciente =
+            await turnosDB.obtenerPacientePorUsuario(
+                id_usuario
+            );
 
-        if (paciente.length === 0) {
+        if (!paciente) {
 
             return res.status(404).json({
                 error: 'Paciente no encontrado'
             });
-
         }
 
-        const id_paciente = paciente[0].id_paciente;
-        const id_obra_social = paciente[0].id_obra_social;
+        const existeMedico =
+            await turnosDB.existeMedico(
+                id_medico
+            );
 
-        // Verificar médico existente
-        const [medico] = await db.query(
-            `SELECT *
-             FROM medicos
-             WHERE id_medico = ?`,
-            [id_medico]
-        );
-
-        if (medico.length === 0) {
+        if (!existeMedico) {
 
             return res.status(404).json({
                 error: 'Médico no encontrado'
             });
-
         }
 
-        // Verificar turno ocupado
-        const [turnoExistente] = await db.query(
-            `SELECT *
-             FROM turnos_reservas
-             WHERE fecha_hora = ?
-             AND id_medico = ?
-             AND activo = 1`,
-            [fecha_hora, id_medico]
+        const medico =
+         await turnosDB.obtenerMedico(
+            id_medico
         );
 
-        if (turnoExistente.length > 0) {
+        const obraSocial =
+        await turnosDB.obtenerObraSocial(
+            paciente.id_obra_social
+        );
+        
+        const valorTotal = calcularValorTotal(
+        medico.valor_consulta,
+        obraSocial.porcentaje_descuento,
+        obraSocial.es_particular);
+
+        const ocupado =
+            await turnosDB.turnoOcupado(
+                fecha_hora,
+                id_medico
+            );
+
+        if (ocupado) {
 
             return res.status(400).json({
                 error: 'Ese turno ya está reservado'
             });
-
         }
 
-        // Crear turno
         const [resultado] = await db.query(
             `INSERT INTO turnos_reservas
             (
@@ -78,41 +84,44 @@ export const crearTurno = async (req, res) => {
             )
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
-                id_medico,
-                id_paciente,
-                id_obra_social,
-                fecha_hora,
-                0,
-                0,
-                1
+            id_medico,
+            paciente.id_paciente,
+            paciente.id_obra_social,
+            fecha_hora,
+            valorTotal,
+            0,
+             1
             ]
         );
 
-        const [turnoCreado] = await db.query(
-            `SELECT *
-             FROM turnos_reservas
-             WHERE id_turno_reserva = ?`,
-            [resultado.insertId]
-        );
+        const turnoCreado =
+            await turnosDB.buscarPorId(
+                resultado.insertId
+            );
 
-        res.status(201).json({
+        return res.status(201).json({
             mensaje: 'Turno reservado correctamente',
-            turno: turnoCreado[0]
+            turno: new TurnoRespuestaDTO(
+                turnoCreado
+            )
         });
 
     } catch (error) {
 
-        res.status(500).json({
+        console.error(error);
+
+        return res.status(500).json({
             error: error.message
         });
-
     }
-
 };
 
 
 // ADMIN - Crear turno para cualquier paciente
-export const crearTurnoAdmin = async (req, res) => {
+export const crearTurnoAdmin = async (
+    req,
+    res
+) => {
 
     try {
 
@@ -122,58 +131,60 @@ export const crearTurnoAdmin = async (req, res) => {
             id_paciente
         } = req.body;
 
-        // Verificar médico
-        const [medico] = await db.query(
-            `SELECT *
-             FROM medicos
-             WHERE id_medico = ?`,
-            [id_medico]
-        );
+        const existeMedico =
+            await turnosDB.existeMedico(
+                id_medico
+            );
 
-        if (medico.length === 0) {
+        if (!existeMedico) {
 
             return res.status(404).json({
                 error: 'Médico no encontrado'
             });
-
         }
 
-        // Verificar paciente
-        const [paciente] = await db.query(
-            `SELECT *
-             FROM pacientes
-             WHERE id_paciente = ?`,
-            [id_paciente]
-        );
+        const paciente =
+            await turnosDB.existePaciente(
+                id_paciente
+            );
 
-        if (paciente.length === 0) {
+        if (!paciente) {
 
             return res.status(404).json({
                 error: 'Paciente no encontrado'
             });
-
         }
+        const medico =
+            await turnosDB.obtenerMedico(
+                id_medico
+            );
 
-        const id_obra_social = paciente[0].id_obra_social;
+        const obraSocial =
+             await turnosDB.obtenerObraSocial(
+                paciente.id_obra_social
+            );
 
-        // Verificar turno ocupado
-        const [turnoExistente] = await db.query(
-            `SELECT *
-             FROM turnos_reservas
-             WHERE fecha_hora = ?
-             AND id_medico = ?
-             AND activo = 1`,
-            [fecha_hora, id_medico]
-        );
+        const valorTotal = calcularValorTotal(
+                 medico.valor_consulta,
+                obraSocial.porcentaje_descuento,
+                obraSocial.es_particular
+            );
 
-        if (turnoExistente.length > 0) {
+        const ocupado =
+            await turnosDB.turnoOcupado(
+                fecha_hora,
+                id_medico
+            );
+
+        if (ocupado) {
 
             return res.status(400).json({
                 error: 'Ese turno ya está reservado'
             });
-
         }
 
+<<<<<<< HEAD
+=======
         // Obtener datos de la obra social
 const [obraSocial] = await db.query(
     `SELECT porcentaje_descuento, es_particular
@@ -194,6 +205,7 @@ if (
 }
 
         // Crear turno
+>>>>>>> origin/main
         const [resultado] = await db.query(
             `INSERT INTO turnos_reservas
             (
@@ -206,6 +218,18 @@ if (
                 activo
             )
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+<<<<<<< HEAD
+        
+            [
+                id_medico,
+                id_paciente,
+                paciente.id_obra_social,
+                fecha_hora,
+                valorTotal,
+                0,
+                1
+            ]
+=======
           [
     id_medico,
     id_paciente,
@@ -215,43 +239,51 @@ if (
     0,
     1
 ]
+>>>>>>> origin/main
         );
 
-        const [turnoCreado] = await db.query(
-            `SELECT *
-             FROM turnos_reservas
-             WHERE id_turno_reserva = ?`,
-            [resultado.insertId]
-        );
+        const turnoCreado =
+            await turnosDB.buscarPorId(
+                resultado.insertId
+            );
 
-        res.status(201).json({
-            mensaje: 'Turno creado por administrador',
-            turno: turnoCreado[0]
+        return res.status(201).json({
+            mensaje:
+                'Turno creado por administrador',
+            turno:
+                new TurnoRespuestaDTO(
+                    turnoCreado
+                )
         });
 
     } catch (error) {
 
-        res.status(500).json({
+        console.error(error);
+
+        return res.status(500).json({
             error: error.message
         });
-
     }
-
 };
 
 
 // MÉDICO Y PACIENTE - Ver sus turnos
-export const listarMisTurnos = async (req, res) => {
+export const listarMisTurnos = async (
+    req,
+    res
+) => {
 
     try {
 
-        const id_usuario = req.user.id;
-        const rol = req.user.rol;
+        const id_usuario =
+            req.user.id;
+
+        const rol =
+            req.user.rol;
 
         let query = '';
         let values = [];
 
-        // MÉDICO
         if (rol === 1) {
 
             query = `
@@ -265,10 +297,7 @@ export const listarMisTurnos = async (req, res) => {
 
             values = [id_usuario];
 
-        }
-
-        // PACIENTE
-        else if (rol === 2) {
+        } else if (rol === 2) {
 
             query = `
                 SELECT tr.*
@@ -280,53 +309,78 @@ export const listarMisTurnos = async (req, res) => {
             `;
 
             values = [id_usuario];
+            
+        }else if (rol === 3) {
 
-        }
+    const [resultados] = await db.query(`
+        SELECT *
+        FROM turnos_reservas
+        WHERE activo = 1
+    `);
 
-        else {
+    return res.status(200).json(
+        resultados.map(
+            turno => new TurnoRespuestaDTO(turno)
+        )
+    );
+
+} 
+
+         else {
 
             return res.status(403).json({
-                error: 'Rol no autorizado'
+                error:
+                    'Rol no autorizado'
             });
-
         }
 
-        const [resultados] = await db.query(query, values);
+        const [resultados] =
+            await db.query(
+                query,
+                values
+            );
 
-        res.status(200).json(resultados);
+        return res.status(200).json(
+            resultados.map(
+                turno =>
+                    new TurnoRespuestaDTO(
+                        turno
+                    )
+            )
+        );
 
     } catch (error) {
 
-        res.status(500).json({
+        console.error(error);
+
+        return res.status(500).json({
             error: error.message
         });
-
     }
-
 };
 
 
 // MÉDICO - Marcar turno como atendido
-export const marcarAtendido = async (req, res) => {
+export const marcarAtendido = async (
+    req,
+    res
+) => {
 
     try {
 
         const { id } = req.params;
 
-        const [turno] = await db.query(
-            `SELECT *
-             FROM turnos_reservas
-             WHERE id_turno_reserva = ?
-             AND activo = 1`,
-            [id]
-        );
+        const turno =
+            await turnosDB.buscarPorId(
+                id
+            );
 
-        if (turno.length === 0) {
+        if (!turno) {
 
             return res.status(404).json({
-                error: 'Turno no encontrado'
+                error:
+                    'Turno no encontrado'
             });
-
         }
 
         await db.query(
@@ -336,24 +390,26 @@ export const marcarAtendido = async (req, res) => {
             [id]
         );
 
-        const [turnoActualizado] = await db.query(
-            `SELECT *
-             FROM turnos_reservas
-             WHERE id_turno_reserva = ?`,
-            [id]
-        );
+        const actualizado =
+            await turnosDB.buscarPorId(
+                id
+            );
 
-        res.status(200).json({
-            mensaje: 'Turno marcado como atendido',
-            turno: turnoActualizado[0]
+        return res.status(200).json({
+            mensaje:
+                'Turno marcado como atendido',
+            turno:
+                new TurnoRespuestaDTO(
+                    actualizado
+                )
         });
 
     } catch (error) {
 
-        res.status(500).json({
+        console.error(error);
+
+        return res.status(500).json({
             error: error.message
         });
-
     }
-
 };

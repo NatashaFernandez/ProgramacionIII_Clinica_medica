@@ -34,9 +34,16 @@ export const validar_permisos = (user, requerimientos) => {
                 }
             } 
 
+            
             // Caso: Requerimiento como array de especificaciones
             else if (Array.isArray(specsRequeridas)) {
-                if (!specsRequeridas.every(s => misSpecs.includes(s) || s === "*")) return false;
+                if (
+                    !specsRequeridas.every(
+                        s => misSpecs.includes(s)
+                    )
+                ) {
+                    return false;
+                }
             }
             // Caso: Requerimiento simple (string)
             else if (typeof specsRequeridas === 'string') {
