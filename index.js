@@ -4,18 +4,19 @@ process.loadEnvFile();
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
-import { requiere_session } from './src/middlewares/requiere_session.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/configuracion/swagger.js';
+import { requiere_session } from './src/middlewares/requiere_session.js';
 
 // Importación de rutas
 import authRutas from './src/rutas/authRutas.js';
-import usuariosRutas from './src/rutas/usuariosRutas.js';
-import especialidadesRutas from './src/rutas/especialidadesRutas.js';
-import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
 import turnosRutas from './src/rutas/turnosRutas.js';
-import observacionesMedicasRutas from './src/rutas/observacionesMedicasRutas.js';
 import medicosRutas from './src/rutas/medicosRutas.js';
+import usuariosRutas from './src/rutas/usuariosRutas.js';
+import pacientesRutas from './src/rutas/pacientesRutas.js';
+import obrasSocialesRutas from './src/rutas/obrasSocialesRutas.js';
+import especialidadesRutas from './src/rutas/especialidadesRutas.js';
+import observacionesMedicasRutas from './src/rutas/observacionesMedicasRutas.js';
 
 const app = express();
 
@@ -28,35 +29,18 @@ app.use(express.json());
 // MIDDLEWARE Morgan
 app.use(morgan('dev'));
 
-// ====================
-// RUTAS SIN VERSIONADO
-// ====================
-
-// Públicas
-app.use('/auth', authRutas);
-app.use('/usuarios', usuariosRutas);
-
-// Protegidas
-app.use('/especialidades', requiere_session, especialidadesRutas);
-app.use('/obras_sociales', requiere_session, obrasSocialesRutas);
-app.use('/turnos', requiere_session, turnosRutas);
-app.use('/medicos', requiere_session, medicosRutas);
-
-// ====================
-// RUTAS VERSIONADAS V1
-// ====================
 
 // Públicas
 app.use('/api/v1/auth', authRutas);
-app.use('/api/v1/usuarios', usuariosRutas);
-app.use('/api/v1/observaciones', requiere_session, observacionesMedicasRutas);
 
 // Protegidas
-app.use('/api/v1/especialidades', requiere_session, especialidadesRutas);
-app.use('/api/v1/obras_sociales', requiere_session, obrasSocialesRutas);
 app.use('/api/v1/turnos', requiere_session, turnosRutas);
 app.use('/api/v1/medicos', requiere_session, medicosRutas);
-app.use('/observaciones', requiere_session, observacionesMedicasRutas);
+app.use('/api/v1/usuarios', requiere_session,  usuariosRutas);
+app.use('/api/v1/pacientes', requiere_session, pacientesRutas);
+app.use('/api/v1/obras_sociales', requiere_session, obrasSocialesRutas);
+app.use('/api/v1/especialidades', requiere_session, especialidadesRutas);
+app.use('/api/v1/observaciones', requiere_session, observacionesMedicasRutas);
 
 // Ruta raíz
 app.get('/', (req, res) => {
