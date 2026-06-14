@@ -4,6 +4,7 @@ import { usuariosControlador } from '../controladores/usuariosControlador.js';
 import { validarCampos } from '../middlewares/validar_campos.js';
 import { requiere_session } from '../middlewares/requiere_session.js';
 import { requiere_permiso } from '../middlewares/requiere_permiso.js';
+import { upload } from '../middlewares/multer.js';
 
 /**
  * @swagger
@@ -68,6 +69,51 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
  *       200:
  *         description: Usuario eliminado
  */
+ /**
+  * @swagger
+  * /usuarios/subir-foto:
+  *   post:
+  *     summary: Subir foto de usuario
+  *     description: Permite subir una imagen de usuario utilizando Multer (multipart/form-data)
+  *     tags:
+  *       - Usuarios
+  *     security:
+  *       - bearerAuth: []
+  *     requestBody:
+  *       required: true
+  *       content:
+  *         multipart/form-data:
+  *           schema:
+  *             type: object
+  *             required:
+  *               - foto
+  *             properties:
+  *               foto:
+  *                 type: string
+  *                 format: binary
+  *                 description: Imagen del usuario (jpg, png, jpeg)
+  *     responses:
+  *       200:
+  *         description: Archivo subido correctamente
+  *         content:
+  *           application/json:
+  *             example:
+  *               mensaje: Archivo recibido
+  *               archivo:
+  *                 fieldname: foto
+  *                 originalname: foto.jpg
+  *                 mimetype: image/jpeg
+  *       400:
+  *         description: No se envió archivo (validación Multer)
+  *         content:
+  *           application/json:
+  *             example:
+  *               mensaje: Debe enviar un archivo
+  *       401:
+  *         description: No autorizado (token inválido o ausente)
+  *       500:
+  *         description: Error interno del servidor
+  */
 
 const router = Router();
 
@@ -108,4 +154,23 @@ router.put('/:id',
 // 5. Eliminar un Usuario (Delete -> Soft Delete)
 router.delete('/:id', requiere_session, requiere_permiso, usuariosControlador.eliminar);
 
+//6. Fotos
+router.post(
+    '/subir-foto',
+    upload.single('foto'),
+    (req, res) => {
+
+        //Validación básica: que exista archivo
+        if (!req.file) {
+            return res.status(400).json({
+                mensaje: 'Debe enviar un archivo'
+            });
+        }
+
+        res.json({
+            mensaje: 'Archivo recibido',
+            archivo: req.file
+        });
+    }
+);
 export default router;

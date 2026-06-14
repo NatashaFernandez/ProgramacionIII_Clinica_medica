@@ -183,33 +183,29 @@ export const crearTurnoAdmin = async (
             });
         }
 
-   // Crear turno
-
-// Crear turno
-
-const [resultado] = await db.query(
-    `INSERT INTO turnos_reservas
-    (
-        id_medico,
-        id_paciente,
-        id_obra_social,
-        fecha_hora,
-        valor_total,
-        atentido,
-        activo
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [
-        id_medico,
-        id_paciente,
-        paciente.id_obra_social,
-        fecha_hora,
-        valorTotal,
-        0,
-        1
-    ]
-);
-
+        const [resultado] = await db.query(
+            `INSERT INTO turnos_reservas
+            (
+                id_medico,
+                id_paciente,
+                id_obra_social,
+                fecha_hora,
+                valor_total,
+                atentido,
+                activo
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        
+            [
+                id_medico,
+                id_paciente,
+                paciente.id_obra_social,
+                fecha_hora,
+                valorTotal,
+                0,
+                1
+            ]
+        );
 
         const turnoCreado =
             await turnosDB.buscarPorId(
