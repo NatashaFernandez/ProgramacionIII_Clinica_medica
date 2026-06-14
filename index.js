@@ -29,6 +29,25 @@ app.use(express.json());
 // MIDDLEWARE Morgan
 app.use(morgan('dev'));
 
+// ====================
+// RUTAS SIN VERSIONADO
+// ====================
+
+// Públicas
+app.use('/auth', authRutas);
+app.use('/usuarios', usuariosRutas);
+
+// Protegidas
+app.use('/especialidades', requiere_session, especialidadesRutas);
+app.use('/obras_sociales', requiere_session, obrasSocialesRutas);
+app.use('/turnos', requiere_session, turnosRutas);
+app.use('/medicos', requiere_session, medicosRutas);
+app.use('/observaciones', requiere_session, observacionesMedicasRutas);
+app.use('/pacientes', requiere_session, pacientesRutas);
+
+// ====================
+// RUTAS VERSIONADAS V1
+// ====================
 
 // Públicas
 app.use('/api/v1/auth', authRutas);
