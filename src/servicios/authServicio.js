@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import Auth from '../db/auth.js';
+import { roles_map } from "../configuracion/permisos.js";
 
 export default class AuthServicio {
 
@@ -18,11 +19,15 @@ export default class AuthServicio {
             return null;
         }
 
+        const rolLabel = roles_map[usuario.rol];
+
+
         const token = jwt.sign(
             {
                 id: usuario.id_usuario,
                 email: usuario.email,
-                rol: usuario.rol
+                rol: usuario.rol,
+                rolLabel
             },
             process.env.CLAVE_JWT || 'clave_secreta_por_defecto',
             {
@@ -38,6 +43,7 @@ export default class AuthServicio {
             documento: usuario.documento,
             email: usuario.email,
             rol: usuario.rol,
+            rolLabel,
             token,
             expiresIn: +new Date(
                 Date.now() + 4 * 60 * 60 * 1000
