@@ -7,7 +7,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /medicos:
+ * /api/v1/medicos:
  *   get:
  *     summary: Obtener todos los médicos
  *     tags: [Médicos]
@@ -20,7 +20,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /medicos/{id_medico}:
+ * /api/v1/medicos/{id_medico}:
  *   get:
  *     summary: Obtener un médico por ID
  *     tags: [Médicos]
@@ -41,7 +41,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /medicos/{id_medico}/obras-sociales:
+ * /api/v1/medicos/{id_medico}/obras-sociales:
  *   get:
  *     summary: Obtener obras sociales asociadas a un médico
  *     tags: [Médicos]
@@ -60,7 +60,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /medicos/{id_medico}/obras-sociales:
+ * /api/v1/medicos/{id_medico}/obras-sociales:
  *   post:
  *     summary: Asociar obras sociales a un médico
  *     tags: [Médicos]
@@ -93,7 +93,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /medicos/{id_medico}/especialidad:
+ * /api/v1/medicos/{id_medico}/especialidad:
  *   put:
  *     summary: Actualizar especialidad de un médico
  *     tags: [Médicos]
