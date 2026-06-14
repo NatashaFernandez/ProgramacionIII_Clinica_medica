@@ -60,10 +60,11 @@ const permisos = {
   medico: {
     browse: {
       turnos: ["owned"],
+      pacientes: ["owned"],
     },
     read: {
       turnos: ["owned"],
-      pacientes: ["datos_contacto"],
+      pacientes: ["owned"],
     },
     edit: {
       turnos: ["atendido"],
@@ -85,42 +86,14 @@ const permisos = {
   },
 };
 
-const medico = {
-  browse_fields: [""],
-  partial_read_fields: [""],
-  read_fields: [],
-  add_fields: [],
-  edit_fields: [],
-  delete_fields: [],
-};
-
-const paciente = {
-  browse_fields: ["id_especialidad", "nombre_especialidad", "nombre_medico", "apellido_medico"],
-  partial_read_fields: ["nombre", "apellido", "especialidad"],
-  read_fields: ["id_turno", "fecha", "hora", "id_medico"],
-  add_fields: ["id_medico", "fecha", "hora"],
-  edit_fields: [],
-  delete_fields: [],
-};
-
-const especialidades = {
-    browse_fields: [],
-    partial_read_fields: [],
-    read_fields: [],
-    add_fields: [],
-    edit_fields: [],
-    delete_fields: [],
+export const ENTIDADES = {
+  "especialidades": 'Especialidades',
+  "obras_sociales": 'Obras sociales',
+  "pacientes": 'Pacientes',
+  "medicos": 'Médicos',
+  "turnos": 'Turnos',
+  "estadisticas": 'Estadísticas',
 }
-
-const obras_sociales = {
-    browse_fields: [],
-    partial_read_fields: [],
-    read_fields: [],
-    add_fields: [],
-    edit_fields: [],
-    delete_fields: [],
-}
-
 
 /**
  * Mapeo de IDs de rol (de la base de datos) a las claves del objeto de permisos.
