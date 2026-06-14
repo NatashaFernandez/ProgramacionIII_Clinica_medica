@@ -56,32 +56,32 @@ export default class Turnos {
 
     obtenerMedico = async (id_medico) => {
 
-    const [medicos] = await db.query(
-        `SELECT
-            id_medico,
-            valor_consulta
-         FROM medicos
-         WHERE id_medico = ?`,
-        [id_medico]
-    );
+        const [medicos] = await db.query(
+            `SELECT
+                id_medico,
+                valor_consulta
+            FROM medicos
+            WHERE id_medico = ?`,
+            [id_medico]
+        );
 
-    return medicos[0] ?? null;
-};
+        return medicos[0] ?? null;
+    };
 
-obtenerObraSocial = async (id_obra_social) => {
+    obtenerObraSocial = async (id_obra_social) => {
 
-    const [obras] = await db.query(
-        `SELECT
-            id_obra_social,
-            porcentaje_descuento,
-            es_particular
-         FROM obras_sociales
-         WHERE id_obra_social = ?`,
-        [id_obra_social]
-    );
+        const [obras] = await db.query(
+            `SELECT
+                id_obra_social,
+                porcentaje_descuento,
+                es_particular
+            FROM obras_sociales
+            WHERE id_obra_social = ?`,
+            [id_obra_social]
+        );
 
-    return obras[0] ?? null;
-};
+        return obras[0] ?? null;
+    };
 
     turnoOcupado = async (
         fecha_hora,

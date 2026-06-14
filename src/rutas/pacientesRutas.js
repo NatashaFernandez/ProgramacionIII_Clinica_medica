@@ -18,7 +18,7 @@ router.get(
     '/',
     /**
      * @swagger
-     * /pacientes:
+     * /api/v1/pacientes:
      *   get:
      *     summary: Listar pacientes
      *     tags:
@@ -36,7 +36,7 @@ router.get(
     '/:id',
     /**
      * @swagger
-     * /pacientes/{id}:
+     * /api/v1/pacientes/{id}:
      *   get:
      *     summary: Obtener paciente por ID
      *     tags:
@@ -62,7 +62,7 @@ router.post(
     '/',
     /**
      * @swagger
-     * /pacientes:
+     * /api/v1/pacientes:
      *   post:
      *     summary: Crear paciente
      *     tags:
@@ -117,7 +117,7 @@ router.put(
     '/:id',
     /**
      * @swagger
-     * /pacientes/{id}:
+     * /api/v1/pacientes/{id}:
      *   put:
      *     summary: Actualizar paciente
      *     tags:
@@ -170,7 +170,7 @@ router.delete(
     '/:id',
     /**
      * @swagger
-     * /pacientes/{id}:
+     * /api/v1/pacientes/{id}:
      *   delete:
      *     summary: Desactivar paciente
      *     tags:

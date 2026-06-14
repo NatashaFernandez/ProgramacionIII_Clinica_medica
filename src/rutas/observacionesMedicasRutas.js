@@ -8,7 +8,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /observaciones/{id}:
+ * /api/v1/observaciones/{id}:
  *   post:
  *     summary: Agregar una observación médica a un turno
  *     tags:
@@ -45,7 +45,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /observaciones/{id}:
+ * /api/v1/observaciones/{id}:
  *   get:
  *     summary: Obtener las observaciones de un turno
  *     tags:

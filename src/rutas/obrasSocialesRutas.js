@@ -12,7 +12,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /obras_sociales:
+ * /api/v1/obras_sociales:
  *   get:
  *     summary: Listar obras sociales
  *     tags:
@@ -21,7 +21,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /obras_sociales/{id}:
+ * /api/v1/obras_sociales/{id}:
  *   get:
  *     summary: Obtener obra social por ID
  *     tags:
@@ -30,7 +30,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /obras_sociales:
+ * /api/v1/obras_sociales:
  *   post:
  *     summary: Crear obra social
  *     tags:
@@ -39,7 +39,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /obras_sociales/{id}:
+ * /api/v1/obras_sociales/{id}:
  *   put:
  *     summary: Actualizar obra social
  *     tags:
@@ -48,7 +48,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /obras_sociales/{id}:
+ * /api/v1/obras_sociales/{id}:
  *   delete:
  *     summary: Eliminar obra social
  *     tags:

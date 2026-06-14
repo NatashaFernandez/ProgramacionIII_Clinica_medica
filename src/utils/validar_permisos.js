@@ -1,56 +1,37 @@
 import permisos, { roles_map } from "../configuracion/permisos.js";
 
 /**
- * Valida si un usuario cumple con un conjunto de requerimientos de permisos.
- * Estructura de requerimientos: { accion: { entidad: [especificaciones] } }
+ * Valida de forma estática (Bread) si el rol del usuario cuenta con una regla 
+ * configurada para realizar la acción solicitada sobre una entidad específica.
  * 
- * @param {object} user - Objeto usuario con propiedad 'rol' (ID numérico)
- * @param {object} requerimientos - Mapa de permisos necesarios para la operación.
- * @returns {boolean} - Verdadero si el usuario tiene todos los permisos requeridos.
+ * @param {Object} user - Objeto del usuario autenticado extraído de req.user.
+ * @param {number|string} user.rol - ID o identificador del rol del usuario.
+ * @param {string} accion - Acción BREAD que se intenta ejecutar (browse, read, add, edit, delete).
+ * @param {string} entidad - Nombre del recurso o tabla sobre la que se opera (ej: 'pacientes').
+ * @returns {boolean} True si el rol tiene permitido el acceso base; False en caso contrario.
  */
-export const validar_permisos = (user, requerimientos) => {
+export const validar_permisos = (user, accion, entidad) => {
+    // 1. Control defensivo: Si el payload del usuario o el rol no son válidos, denegar de inmediato
     if (!user || !user.rol) return false;
 
+    // 2. Mapeamos el ID del rol al string correspondiente (ej: 2 -> "medico")
     const rolKey = roles_map[user.rol];
-    const misPermisos = permisos[rolKey];
+    if (!rolKey) return false;
 
-    if (!misPermisos) return false;
+    // 3. Extraemos la configuración de permisos para el rol, acción y entidad específicos
+    const configPermisosBase = permisos[rolKey]?.[accion]?.[entidad];
 
-    for (const [accion, entidades] of Object.entries(requerimientos)) {
-        const misEntidades = misPermisos[accion];
-        if (!misEntidades) return false;
-
-        for (const [entidad, specsRequeridas] of Object.entries(entidades)) {
-            const misSpecs = misEntidades[entidad];
-            if (!misSpecs) return false;
-
-            // Si el usuario tiene acceso total ('*') en este nivel, saltamos validación detallada
-            if (misSpecs.includes("*")) continue;
-
-            // Caso: Requerimiento como objeto (ejemplo del usuario para agrupar bajo una entidad)
-            if (typeof specsRequeridas === 'object' && !Array.isArray(specsRequeridas)) {
-                for (const subEntidad in specsRequeridas) {
-                    if (!misSpecs.includes(subEntidad)) return false;
-                }
-            } 
-
-            
-            // Caso: Requerimiento como array de especificaciones
-            else if (Array.isArray(specsRequeridas)) {
-                if (
-                    !specsRequeridas.every(
-                        s => misSpecs.includes(s)
-                    )
-                ) {
-                    return false;
-                }
-            }
-            // Caso: Requerimiento simple (string)
-            else if (typeof specsRequeridas === 'string') {
-                if (!misSpecs.includes(specsRequeridas)) return false;
-            }
-        }
+    // 4. Si es un Array (campos globales) o un Objeto con la propiedad 'owned', el permiso base existe
+    if (Array.isArray(configPermisosBase)) {
+        return true;
+    }
+    
+    if (configPermisosBase && typeof configPermisosBase === "object" && configPermisosBase.owned) {
+        return true;
     }
 
-    return true;
+    // Si no coincide con ninguna estructura autorizada en permisos.js, se rechaza
+    return false;
 };
+
+export default validar_permisos;

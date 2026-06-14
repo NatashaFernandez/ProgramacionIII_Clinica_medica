@@ -12,7 +12,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /especialidades:
+ * /api/v1/especialidades:
  *   get:
  *     summary: Listar especialidades
  *     tags:
@@ -24,7 +24,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /especialidades/{id}:
+ * /api/v1/especialidades/{id}:
  *   get:
  *     summary: Obtener especialidad por ID
  *     tags:
@@ -33,7 +33,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /especialidades:
+ * /api/v1/especialidades:
  *   post:
  *     summary: Crear especialidad
  *     tags:
@@ -42,7 +42,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /especialidades/{id}:
+ * /api/v1/especialidades/{id}:
  *   put:
  *     summary: Actualizar especialidad
  *     tags:
@@ -51,7 +51,7 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 /**
  * @swagger
- * /especialidades/{id}:
+ * /api/v1/especialidades/{id}:
  *   delete:
  *     summary: Eliminar especialidad
  *     tags:

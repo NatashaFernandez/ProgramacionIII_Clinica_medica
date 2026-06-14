@@ -62,30 +62,30 @@ export default class MedicosControlador {
 
     buscarPorEspecialidad = async (req, res) => {
 
-    try {
+        try {
 
-        const { id_especialidad } = req.params;
+            const { id_especialidad } = req.params;
 
-        const medicos =
-            await this.medicos.buscarPorEspecialidad(
-                id_especialidad
-            );
+            const medicos =
+                await this.medicos.buscarPorEspecialidad(
+                    id_especialidad
+                );
 
-        res.status(200).json({
-            estado: true,
-            mensaje: 'Médicos encontrados',
-            medicos
-        });
+            res.status(200).json({
+                estado: true,
+                mensaje: 'Médicos encontrados',
+                medicos
+            });
 
-    } catch (error) {
+        } catch (error) {
 
-        res.status(500).json({
-            estado: false,
-            mensaje: error.message
-        });
+            res.status(500).json({
+                estado: false,
+                mensaje: error.message
+            });
 
-    }
-};
+        }
+    };
 
     buscarObrasSociales = async (req, res) => {
 

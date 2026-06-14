@@ -7,7 +7,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /usuarios:
+ * /api/v1/usuarios:
  *   get:
  *     summary: Listar usuarios activos
  *     tags:
@@ -19,7 +19,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /usuarios/{id}:
+ * /api/v1/usuarios/{id}:
  *   get:
  *     summary: Obtener usuario por ID
  *     tags:
@@ -35,7 +35,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /usuarios:
+ * /api/v1/usuarios:
  *   post:
  *     summary: Registrar usuario
  *     tags:
@@ -47,7 +47,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /usuarios/{id}:
+ * /api/v1/usuarios/{id}:
  *   put:
  *     summary: Actualizar usuario
  *     tags:
@@ -59,7 +59,7 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 
 /**
  * @swagger
- * /usuarios/{id}:
+ * /api/v1/usuarios/{id}:
  *   delete:
  *     summary: Baja lógica de usuario
  *     tags:

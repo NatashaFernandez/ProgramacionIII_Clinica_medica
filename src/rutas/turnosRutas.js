@@ -80,7 +80,7 @@ router.put('/:id/atentido',
 
 /**
  * @swagger
- * /turnos/mis-turnos:
+ * /api/v1/turnos/mis-turnos:
  *   get:
  *     summary: Obtiene los turnos del usuario autenticado
  *     tags:
@@ -92,7 +92,7 @@ router.put('/:id/atentido',
 
 /**
  * @swagger
- * /turnos:
+ * /api/v1/turnos:
  *   post:
  *     summary: Crear turno propio
  *     tags:
@@ -101,7 +101,7 @@ router.put('/:id/atentido',
 
 /**
  * @swagger
- * /turnos/admin:
+ * /api/v1/turnos/admin:
  *   post:
  *     summary: Crear turno como administrador
  *     tags:
@@ -110,7 +110,7 @@ router.put('/:id/atentido',
 
 /**
  * @swagger
- * /turnos/mis-turnos:
+ * /api/v1/turnos/mis-turnos:
  *   get:
  *     summary: Listar mis turnos
  *     tags:
@@ -119,7 +119,7 @@ router.put('/:id/atentido',
 
 /**
  * @swagger
- * /turnos/{id}/atentido:
+ * /api/v1/turnos/{id}/atentido:
  *   put:
  *     summary: Marcar turno como atendido
  *     tags:
