@@ -29,6 +29,9 @@ app.use(express.json());
 // MIDDLEWARE Morgan
 app.use(morgan('dev'));
 
+// MIDDLEWARE para archivos subidos
+app.use('/uploads', express.static('uploads'));
+
 // ====================
 // RUTAS SIN VERSIONADO
 // ====================

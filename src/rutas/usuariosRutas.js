@@ -4,6 +4,7 @@ import { usuariosControlador } from '../controladores/usuariosControlador.js';
 import { validarCampos } from '../middlewares/validar_campos.js';
 import { requiere_session } from '../middlewares/requiere_session.js';
 import { requiere_permiso } from '../middlewares/requiere_permiso.js';
+import { upload } from '../middlewares/multer.js';
 
 /**
  * @swagger
@@ -108,4 +109,15 @@ router.put('/:id',
 // 5. Eliminar un Usuario (Delete -> Soft Delete)
 router.delete('/:id', requiere_session, requiere_permiso, usuariosControlador.eliminar);
 
+//6. Fotos
+router.post(
+    '/subir-foto',
+    upload.single('foto'),
+    (req, res) => {
+        res.json({
+            mensaje: 'Archivo recibido',
+            archivo: req.file
+        });
+    }
+);
 export default router;
