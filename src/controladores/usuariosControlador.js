@@ -1,285 +1,139 @@
 import db from '../configuracion/db.js';
 
-import Usuarios from '../db/usuarios.js';
-import UsuarioRespuestaDTO from '../dto/UsuarioRespuestaDTO.js';
-
-const usuariosDB = new Usuarios();
-
 export const usuariosControlador = {
+    
 
-    /* LISTAR USUARIOS */
     listar: async (req, res) => {
-
         try {
-
-            const usuarios = await usuariosDB.buscarTodos();
-
-            return res.status(200).json(
-                usuarios.map(
-                    usuario => new UsuarioRespuestaDTO(usuario)
-                )
+            const [usuarios] = await db.query(
+                'SELECT id_usuario, documento, apellido, nombres, email, foto_path, rol FROM usuarios WHERE activo = 1'
             );
-
+            res.json(usuarios);
         } catch (error) {
-
-            console.error(error);
-
-            return res.status(500).json({
-                error: 'Error al obtener los usuarios'
-            });
+            res.status(500).json({ error: "Error al obtener los usuarios: " + error.message });
         }
     },
 
-    /* OBTENER USUARIO POR ID */
     obtenerPorId: async (req, res) => {
-
+        const { id } = req.params;
         try {
-
-            const { id } = req.params;
-
-            if (isNaN(id)) {
-                return res.status(400).json({
-                    error: 'ID inválido'
-                });
-            }
-
-            const usuario = await usuariosDB.buscarPorId(id);
-
-            if (!usuario) {
-                return res.status(404).json({
-                    error: 'Usuario no encontrado'
-                });
-            }
-
-            return res.status(200).json(
-                new UsuarioRespuestaDTO(usuario)
+            const [usuarios] = await db.query(
+                'SELECT id_usuario, documento, apellido, nombres, email, foto_path, rol FROM usuarios WHERE id_usuario = ? AND activo = 1',
+                [id]
             );
 
+            if (usuarios.length === 0) {
+                return res.status(404).json({ error: "Usuario no encontrado o inactivo" });
+            }
+
+            res.json(usuarios[0]);
         } catch (error) {
-
-            console.error(error);
-
-            return res.status(500).json({
-                error: 'Error al obtener el usuario'
-            });
+            res.status(500).json({ error: "Error al obtener el usuario: " + error.message });
         }
     },
 
-    /* REGISTRAR USUARIO */
     registrar: async (req, res) => {
+        const { documento, apellido, nombres, email, contrasenia, rol, id_obra_social } = req.body;
+
+        const fotoPath = req.file ? `uploads/${req.file.filename}` : null;
 
         const conexion = await db.getConnection();
 
         try {
-
-            const {
-                documento,
-                apellido,
-                nombres,
-                email,
-                contrasenia,
-                rol,
-                id_obra_social
-            } = req.body;
-
             await conexion.beginTransaction();
 
-            const usuarioExistente =
-                await usuariosDB.buscarPorEmail(email);
-
-            if (usuarioExistente) {
-
-                await conexion.rollback();
-
-                return res.status(409).json({
-                    error: 'Ya existe un usuario con ese email'
-                });
-            }
-
             const [resultadoUsuario] = await conexion.query(
-                `INSERT INTO usuarios (
-                    documento,
-                    apellido,
-                    nombres,
-                    email,
-                    contrasenia,
-                    foto_path,
-                    rol,
-                    activo
-                )
-                VALUES (
-                    ?, ?, ?, ?,
-                    SHA2(?, 256),
-                    '',
-                    ?,
-                    1
-                )`,
-                [
-                    documento,
-                    apellido,
-                    nombres,
-                    email,
-                    contrasenia,
-                    rol
-                ]
+                `INSERT INTO usuarios (documento, apellido, nombres, email, contrasenia, foto_path, rol, activo) 
+                 VALUES (?, ?, ?, ?, SHA2(?, 256), ?, ?, 1)`,
+                [documento, apellido, nombres, email, contrasenia, fotoPath, rol]
             );
 
-            const nuevoIdUsuario =
-                resultadoUsuario.insertId;
+            const nuevoIdUsuario = resultadoUsuario.insertId;
 
             if (Number(rol) === 2) {
-
                 if (!id_obra_social) {
-
-                    await conexion.rollback();
-
-                    return res.status(400).json({
-                        error: 'El campo id_obra_social es obligatorio para pacientes'
-                    });
+                    throw new Error("El campo id_obra_social es obligatorio para el rol Paciente.");
                 }
 
                 await conexion.query(
-                    `INSERT INTO pacientes (
-                        id_usuario,
-                        id_obra_social
-                    )
-                    VALUES (?, ?)`,
-                    [
-                        nuevoIdUsuario,
-                        id_obra_social
-                    ]
+                    'INSERT INTO pacientes (id_usuario, id_obra_social) VALUES (?, ?)',
+                    [nuevoIdUsuario, id_obra_social]
                 );
             }
 
             await conexion.commit();
 
-            const usuario =
-                await usuariosDB.buscarPorId(
-                    nuevoIdUsuario
-                );
-
-            return res.status(201).json({
-                mensaje: 'Usuario registrado con éxito',
-                usuario: new UsuarioRespuestaDTO(usuario)
+            res.status(201).json({
+                mensaje: "Usuario registrado con éxito",
+                id_usuario: nuevoIdUsuario,
+                foto_path: fotoPath 
             });
 
         } catch (error) {
-
-            await conexion.rollback();
-
-            console.error(error);
-
+            await conexion.rollback(); 
             if (error.code === 'ER_DUP_ENTRY') {
-                return res.status(400).json({
-                    error: 'El documento o email ya se encuentran registrados'
-                });
+                return res.status(400).json({ error: "El documento o email ya se encuentran registrados." });
             }
-
-            return res.status(500).json({
-                error: 'Error al registrar el usuario'
-            });
-
+            res.status(500).json({ error: "Error al registrar el usuario: " + error.message });
         } finally {
-
             conexion.release();
         }
     },
 
-    /* ACTUALIZAR USUARIO */
     actualizar: async (req, res) => {
-
+        const { id } = req.params;
+        const { documento, apellido, nombres, email } = req.body;
+        
         try {
-
-            const { id } = req.params;
-
-            const {
-                documento,
-                apellido,
-                nombres,
-                email
-            } = req.body;
-
-            const usuario =
-                await usuariosDB.buscarPorId(id);
-
-            if (!usuario) {
-                return res.status(404).json({
-                    error: 'Usuario no encontrado'
-                });
+            let resultado;
+            
+            if (req.file) {
+                const nuevaFotoPath = `uploads/${req.file.filename}`;
+                
+                [resultado] = await db.query(
+                    `UPDATE usuarios 
+                     SET documento = ?, apellido = ?, nombres = ?, email = ?, foto_path = ? 
+                     WHERE id_usuario = ? AND activo = 1`,
+                    [documento, apellido, nombres, email, nuevaFotoPath, id]
+                );
+            } else {
+                [resultado] = await db.query(
+                    `UPDATE usuarios 
+                     SET documento = ?, apellido = ?, nombres = ?, email = ? 
+                     WHERE id_usuario = ? AND activo = 1`,
+                    [documento, apellido, nombres, email, id]
+                );
             }
 
-            await db.query(
-                `UPDATE usuarios
-                 SET documento = ?,
-                     apellido = ?,
-                     nombres = ?,
-                     email = ?
-                 WHERE id_usuario = ?`,
-                [
-                    documento,
-                    apellido,
-                    nombres,
-                    email,
-                    id
-                ]
-            );
+            if (resultado.affectedRows === 0) {
+                return res.status(404).json({ error: "Usuario no encontrado o inactivo" });
+            }
 
-            const usuarioActualizado =
-                await usuariosDB.buscarPorId(id);
-
-            return res.status(200).json({
-                mensaje: 'Usuario actualizado con éxito',
-                usuario: new UsuarioRespuestaDTO(
-                    usuarioActualizado
-                )
-            });
-
+            res.json({ mensaje: "Usuario actualizado con éxito" });
         } catch (error) {
-
-            console.error(error);
-
             if (error.code === 'ER_DUP_ENTRY') {
-                return res.status(400).json({
-                    error: 'El documento o email ya están en uso por otro usuario'
-                });
+                return res.status(400).json({ error: "El documento o email ya están en uso por otro usuario." });
             }
-
-            return res.status(500).json({
-                error: 'Error al actualizar el usuario'
-            });
+            res.status(500).json({ error: "Error al actualizar el usuario: " + error.message });
         }
     },
 
-    /* ELIMINAR (SOFT DELETE) */
     eliminar: async (req, res) => {
+        const { id } = req.params;
 
         try {
+            const [resultado] = await db.query(
+                'UPDATE usuarios SET activo = 0 WHERE id_usuario = ?',
+                [id]
+            );
 
-            const { id } = req.params;
-
-            const usuario =
-                await usuariosDB.buscarPorId(id);
-
-            if (!usuario) {
-                return res.status(404).json({
-                    error: 'Usuario no encontrado'
-                });
+            if (resultado.affectedRows === 0) {
+                return res.status(404).json({ error: "Usuario no encontrado" });
             }
 
-            await usuariosDB.desactivar(id);
-
-            return res.status(200).json({
-                mensaje: 'Usuario dado de baja con éxito'
-            });
-
+            res.json({ mensaje: "Usuario dado de baja con éxito (Soft Delete)" });
         } catch (error) {
-
-            console.error(error);
-
-            return res.status(500).json({
-                error: 'Error al dar de baja el usuario'
-            });
+            res.status(500).json({ error: "Error al dar de baja el usuario: " + error.message });
         }
     }
-
 };
