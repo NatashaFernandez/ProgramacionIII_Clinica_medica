@@ -4,8 +4,7 @@ import { usuariosControlador } from '../controladores/usuariosControlador.js';
 import { requiere_session } from '../middlewares/requiere_session.js';
 import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 import { validarCampos } from '../middlewares/validar_campos.js';
-import { upload } from '../middlewares/multer.js'; // Importación de tu Multer
-
+import { upload } from '../middlewares/multer.js';
 const router = Router();
 
 /**
