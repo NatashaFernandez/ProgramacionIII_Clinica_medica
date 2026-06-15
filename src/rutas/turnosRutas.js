@@ -133,5 +133,35 @@ router.get(
     }),
     listarMisTurnos
 );
+import { obtenerEstadisticas, descargarInformePDF } from '../controladores/reportesControlador.js';
+
+
+/**
+ * @swagger
+ * /api/v1/turnos/admin/estadisticas:
+ * get:
+ * summary: Obtener estadísticas globales desde Stored Procedure
+ * tags: [Turnos]
+ * security:
+ * - bearerAuth: []
+ */
+router.get('/admin/estadisticas',
+    requiere_permiso({ browse: { estadisticas: ["*"] } }),
+    obtenerEstadisticas
+);
+
+/**
+ * @swagger
+ * /api/v1/turnos/admin/informe-pdf:
+ * get:
+ * summary: Descargar reporte ejecutivo en formato PDF
+ * tags: [Turnos]
+ * security:
+ * - bearerAuth: []
+ */
+router.get('/admin/informe-pdf',
+    requiere_permiso({ browse: { turnos: ["*"] } }),
+    descargarInformePDF
+);
 
 export default router;
