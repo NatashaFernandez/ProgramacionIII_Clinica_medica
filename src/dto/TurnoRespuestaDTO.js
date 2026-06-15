@@ -20,8 +20,8 @@ export default class TurnoRespuestaDTO {
         this.valor_total =
             turno.valor_total;
 
-        this.atentido =
-            turno.atentido;
+        this.atendido =
+            turno.atendido;
 
         this.activo =
             turno.activo;
