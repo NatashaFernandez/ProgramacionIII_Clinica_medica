@@ -63,13 +63,13 @@ const permisos = {
       pacientes: ["owned"],
     },
     read: {
-      turnos: ["owned"],
-      pacientes: {
-        owned: ["*"]
-      },
+      turnos: { owned: ["*"] },
+      pacientes: { owned: ["*"] },
     },
     edit: {
-      turnos: ["atendido"],
+      turnos: {
+        owned: ["atendido"],
+      }
     },
   },
   paciente: {
