@@ -38,12 +38,15 @@ export const requiere_permiso = (requerimientos) => {
         const DEBUG = process.env.MODO_DEBUG === "true";
 
         if (!req.user || !req.user.rol) {
+            if (DEBUG) console.warn("[DEBUG-REQUIERE_PERMISO] Acceso denegado: No hay información de usuario o rol en la solicitud.");
             return res.status(401).json({ error: "No autorizado" });
         }
 
         const rolKey = roles_map[req.user.rol];
+        if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Iniciando verificación para el rol: ${rolKey}`);
 
         if (rolKey === "admin") {
+            if (DEBUG) console.log("[DEBUG-REQUIERE_PERMISO] Acceso concedido automáticamente (Administrador).");
             return next();
         }
 
@@ -59,9 +62,11 @@ export const requiere_permiso = (requerimientos) => {
                 entidad,
                 especificacionRuta
             );
+        
+        if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] ¿Tiene permiso base sobre la entidad? ${tienePermisoBase ? 'SÍ' : 'NO'}`);
 
         if (!tienePermisoBase) {
-
+            if (DEBUG) console.warn(`[DEBUG-REQUIERE_PERMISO] Denegado: El rol [${rolKey}] no tiene permisos configurados para [${accion}] sobre [${entidad}].`);
             return res.status(403).json(
                 DEBUG
                     ? {
@@ -107,8 +112,10 @@ export const requiere_permiso = (requerimientos) => {
         }
 
         if (requiereValidarPropiedad && funcionVerificadora) {
+            if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Validando propiedad del recurso para ${entidad}...`);
             try {
                 const esPropietario = await funcionVerificadora(req, res);
+                if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Resultado de validación de propiedad: ${esPropietario ? 'PROPIETARIO' : 'AJENO'}`);
                 if (!esPropietario) {
                     return res.status(403).json(
                         DEBUG
@@ -130,6 +137,7 @@ export const requiere_permiso = (requerimientos) => {
 
         // 5. Validación "Fail-Fast" de campos (Cruzando req.body contra permisos.js)
         if ((accion === "edit" || accion === "add") && camposFinalesPermitidos) {
+            if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Verificando lista blanca de campos para [${accion}]...`);
             if (!camposFinalesPermitidos.includes("*")) {
                 const camposEnviados = Object.keys(req.body);
                 
@@ -139,6 +147,7 @@ export const requiere_permiso = (requerimientos) => {
                 );
 
                 if (camposNoPermitidos.length > 0) {
+                    if (DEBUG) console.warn(`[DEBUG-REQUIERE_PERMISO] Intento de modificar campos no autorizados: [${camposNoPermitidos.join(", ")}]`);
                     return res.status(400).json(
                         DEBUG
                             ? {
@@ -155,6 +164,7 @@ export const requiere_permiso = (requerimientos) => {
             }
         }
 
+        if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Autorización exitosa para [${accion}] en [${entidad}].`);
         next();
     };
 };

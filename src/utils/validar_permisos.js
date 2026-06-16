@@ -20,13 +20,21 @@ export const validar_permisos = (
     especificacionRuta = null
 ) => {
 
+     const MODO_DEBUG = process.env.MODO_DEBUG === 'true';
+
+    if (MODO_DEBUG) {
+        console.log(`[DEBUG-PERMISOS] Validando: Usuario ID ${user?.id}, Rol ${user?.rol}, Acción ${accion}, Entidad ${entidad}`);
+    }
+
     if (!user?.rol) {
+        if (MODO_DEBUG) console.warn(`[DEBUG-PERMISOS] Fallo: El objeto usuario no contiene un rol válido.`);
         return false;
     }
 
     const rolKey = roles_map[user.rol];
 
     if (!rolKey) {
+        if (MODO_DEBUG) console.warn(`[DEBUG-PERMISOS] Fallo: El ID de rol ${user.rol} no está definido en roles_map.`);
         return false;
     }
 
@@ -34,6 +42,7 @@ export const validar_permisos = (
         permisos[rolKey]?.[accion]?.[entidad];
 
     if (!permisoRol) {
+        if (MODO_DEBUG) console.warn(`[DEBUG-PERMISOS] Fallo: No existen reglas para ${rolKey} -> ${accion} -> ${entidad} en permisos.js.`);
         return false;
     }
 
@@ -60,24 +69,34 @@ export const validar_permisos = (
         typeof especificacionRuta.owned === "function";
 
     if (rolEsGlobal) {
+        if (MODO_DEBUG) console.log(`[DEBUG-PERMISOS] Éxito: El rol ${rolKey} tiene acceso total ('*') a esta entidad.`);
         return true;
     }
 
     if (rolEsOwned) {
+        if (MODO_DEBUG) console.log(`[DEBUG-PERMISOS] Verificando: El rol requiere propiedad. ¿La ruta provee verificador 'owned'? ${rutaEsOwned}`);
         return rutaEsOwned;
     }
 
     if (Array.isArray(permisoRol)) {
 
         if (!Array.isArray(especificacionRuta)) {
+            if (MODO_DEBUG) console.warn(`[DEBUG-PERMISOS] Inconsistencia: El rol define campos permitidos pero la ruta no especifica una lista de campos.`);
             return false;
         }
 
-        return especificacionRuta.every(
+        const todosValidos = especificacionRuta.every(
             campo => permisoRol.includes(campo)
         );
+
+        if (MODO_DEBUG && !todosValidos) console.warn(`[DEBUG-PERMISOS] Fallo: Uno o más campos requeridos por la ruta no están permitidos para este rol.`);
+        return todosValidos;
     }
 
+    if (MODO_DEBUG) {
+        console.warn(`[DEBUG-PERMISOS] Denegando acceso: No se encontró una coincidencia válida entre los permisos del rol y la especificación de la ruta.`);
+    }
+    
     return false;
 };
 
