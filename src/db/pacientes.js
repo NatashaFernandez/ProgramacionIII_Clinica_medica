@@ -51,4 +51,65 @@ export default class Pacientes {
         return obra.length > 0;
     };
 
+    obtenerIdMedicoPorUsuario = async (id_usuario) => {
+
+        const [medicos] = await db.query(
+            `
+            SELECT id_medico
+            FROM medicos
+            WHERE id_usuario = ?
+            `,
+            [id_usuario]
+        );
+
+        return medicos[0] ?? null;
+    };
+
+    esPacienteDeMedico = async (
+        id_usuario_medico,
+        id_paciente
+    ) => {
+
+        const sql = `
+            SELECT 1
+            FROM turnos_reservas tr
+            INNER JOIN medicos m
+                ON tr.id_medico = m.id_medico
+            WHERE m.id_usuario = ?
+            AND tr.id_paciente = ?
+            AND tr.activo = 1
+            LIMIT 1
+        `;
+
+        const [resultado] = await db.query(
+            sql,
+            [
+                id_usuario_medico,
+                id_paciente
+            ]
+        );
+
+        return resultado.length > 0;
+    };
+
+    buscarPorMedicoUsuario = async (id_usuario_medico) => {
+
+        const sql = `
+            SELECT DISTINCT vp.*
+            FROM v_pacientes vp
+            INNER JOIN turnos_reservas tr
+                ON vp.id_paciente = tr.id_paciente
+            INNER JOIN medicos m
+                ON tr.id_medico = m.id_medico
+            WHERE m.id_usuario = ?
+            AND tr.activo = 1
+        `;
+
+        const [pacientes] = await db.query(
+            sql,
+            [id_usuario_medico]
+        );
+
+        return pacientes;
+    };
 }

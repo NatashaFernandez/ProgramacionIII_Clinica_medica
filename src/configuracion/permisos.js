@@ -64,7 +64,9 @@ const permisos = {
     },
     read: {
       turnos: ["owned"],
-      pacientes: ["owned"],
+      pacientes: {
+        owned: ["*"]
+      },
     },
     edit: {
       turnos: ["atendido"],

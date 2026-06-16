@@ -29,6 +29,34 @@ export const listarPacientes = async (req, res) => {
     }
 };
 
+/* LISTAR MIS PACIENTES */
+export const listarMisPacientes = async (req, res) => {
+
+    try {
+
+        const pacientes =
+            await pacientesDB.buscarPorMedicoUsuario(
+                req.user.id
+            );
+
+        return res.status(200).json(
+            pacientes.map(
+                paciente => new PacienteRespuestaDTO(
+                    paciente
+                )
+            )
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            mensaje: 'Error interno del servidor'
+        });
+    }
+};
+
 /* OBTENER PACIENTE */
 export const obtenerPaciente = async (req, res) => {
 
