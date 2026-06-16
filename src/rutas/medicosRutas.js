@@ -17,7 +17,28 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
  *       200:
  *         description: Lista de médicos
  */
-
+/**
+ * @swagger
+ * /api/v1/medicos/especialidad/{id_especialidad}:
+ *   get:
+ *     summary: Obtener médicos por especialidad
+ *     tags: [Médicos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_especialidad
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de médicos de la especialidad
+ *       400:
+ *         description: ID inválido
+ *       404:
+ *         description: No se encontraron médicos
+ */
 /**
  * @swagger
  * /api/v1/medicos/{id_medico}:

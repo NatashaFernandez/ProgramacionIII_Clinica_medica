@@ -348,6 +348,29 @@ export const marcarAtendido = async (
             });
         }
 
+        const id_usuario = req.user.id;
+
+        const [medicos] = await db.query(
+        `SELECT id_medico
+     FROM medicos
+         WHERE id_usuario = ?`,
+     [id_usuario]
+);
+
+        if (medicos.length === 0) {
+    return res.status(404).json({
+        error: 'Médico no encontrado'
+    });
+}
+
+const id_medico_logueado = medicos[0].id_medico;
+
+if (turno.id_medico !== id_medico_logueado) {
+    return res.status(403).json({
+        error: 'No puede marcar turnos de otro médico'
+    });
+}
+
         await db.query(
             `UPDATE turnos_reservas
              SET atentido = 1
