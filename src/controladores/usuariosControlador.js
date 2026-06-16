@@ -1,4 +1,3 @@
-
 import db from '../configuracion/db.js';
 
 export const usuariosControlador = {
