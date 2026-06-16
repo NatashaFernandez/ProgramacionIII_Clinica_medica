@@ -1,6 +1,7 @@
 import express from 'express';
 import {
     listarPacientes,
+    listarMisPacientes,
     obtenerPaciente,
     agregarPaciente,
     actualizarPaciente,
@@ -11,7 +12,42 @@ import { requiere_permiso } from '../middlewares/requiere_permiso.js';
 import { body } from 'express-validator';
 import { validarCampos } from '../middlewares/validar_campos.js';
 
+
+import { pacienteOwnershipResolver }
+    from '../db/resolvers/pacienteOwnershipResolver.js';
+
 const router = express.Router();
+
+
+router.get(
+    '/mis-pacientes',
+    (req, res, next) => {
+        console.log('ENTRO A MIS PACIENTES');
+        next();
+    },
+    requiere_permiso({
+        browse: {
+            pacientes: ['owned']
+        }
+    }),
+    listarMisPacientes
+);
+
+router.get(
+    '/mis-pacientes/:id',
+
+    requiere_permiso({
+        read: {
+            pacientes: {
+                owned: pacienteOwnershipResolver,
+                fields: ['*']
+            }
+        }
+    }),
+
+    obtenerPaciente
+);
+
 
 /* LISTAR PACIENTES */
 router.get(
@@ -53,7 +89,7 @@ router.get(
      *       404:
      *         description: No encontrado
      */
-    requiere_permiso({ read: { pacientes: ["*"] } }),
+    requiere_permiso({ read: { pacientes:  ['*'] }}),
     obtenerPaciente
 );
 

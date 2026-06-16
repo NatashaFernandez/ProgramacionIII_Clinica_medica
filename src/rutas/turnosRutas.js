@@ -12,6 +12,10 @@ import { validarCampos } from '../middlewares/validar_campos.js';
 
 import { body } from 'express-validator';
 
+
+import { turnoOwnershipResolver }
+    from '../db/resolvers/turnoOwnershipResolver.js';
+
 const router = express.Router();
 
 
@@ -72,7 +76,10 @@ router.get('/mis-turnos',
 router.put('/:id/atentido',
 
     requiere_permiso({
-        edit: { turnos: ['atendido'] }
+        edit: { turnos: {
+            owned: turnoOwnershipResolver,
+            fields: ['atendido']
+        } }
     }),
 
     marcarAtendido

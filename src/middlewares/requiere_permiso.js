@@ -35,29 +35,53 @@ import permisos, { roles_map, ENTIDADES } from "../configuracion/permisos.js";
  */
 export const requiere_permiso = (requerimientos) => {
     return async (req, res, next) => {
+        const DEBUG = process.env.MODO_DEBUG === "true";
+
         if (!req.user || !req.user.rol) {
+            if (DEBUG) console.warn("[DEBUG-REQUIERE_PERMISO] Acceso denegado: No hay información de usuario o rol en la solicitud.");
             return res.status(401).json({ error: "No autorizado" });
         }
 
         const rolKey = roles_map[req.user.rol];
+        if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Iniciando verificación para el rol: ${rolKey}`);
 
         if (rolKey === "admin") {
+            if (DEBUG) console.log("[DEBUG-REQUIERE_PERMISO] Acceso concedido automáticamente (Administrador).");
             return next();
         }
 
         const [accion] = Object.keys(requerimientos);
         const [entidad] = Object.keys(requerimientos[accion]);
+        
+        const especificacionRuta = requerimientos[accion][entidad];
+        
+        const tienePermisoBase =
+            validar_permisos(
+                req.user,
+                accion,
+                entidad,
+                especificacionRuta
+            );
+        
+        if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] ¿Tiene permiso base sobre la entidad? ${tienePermisoBase ? 'SÍ' : 'NO'}`);
 
-        // 1. Validación Bread base. Se revisa si de entrada el rol del usuario actual tiene un permiso para la accion/entidad requerida
-        const tienePermisoBase = validar_permisos(req.user, accion, entidad);
         if (!tienePermisoBase) {
-            return res.status(403).json({ 
-                error: "Permisos insuficientes",
-                mensaje: `Tu rol no puede realizar la acción [${accion}] sobre [${entidad}].`
-            });
+            if (DEBUG) console.warn(`[DEBUG-REQUIERE_PERMISO] Denegado: El rol [${rolKey}] no tiene permisos configurados para [${accion}] sobre [${entidad}].`);
+            return res.status(403).json(
+                DEBUG
+                    ? {
+                        error: "Permisos insuficientes",
+                        mensaje:
+                            `Tu rol no puede realizar la acción [${accion}] sobre [${entidad}].`
+                    }
+                    : {
+                        error: "Acceso denegado",
+                        mensaje:
+                            "No puedes acceder a este recurso debido a tu rol actual."
+                    }
+            );
         }
 
-        // 2. Extraemos la configuración real e inviolable de permisos.js
         const configPermisosBase = permisos[rolKey][accion][entidad];
         
         let camposFinalesPermitidos = null;
@@ -74,7 +98,6 @@ export const requiere_permiso = (requerimientos) => {
         }
 
         // 3. Inspeccionamos lo que el desarrollador configuró en la ruta de Express
-        const especificacionRuta = requerimientos[accion][entidad];
         let funcionVerificadora = null;
 
         if (especificacionRuta && typeof especificacionRuta === "object" && typeof especificacionRuta.owned === "function") {
@@ -89,13 +112,22 @@ export const requiere_permiso = (requerimientos) => {
         }
 
         if (requiereValidarPropiedad && funcionVerificadora) {
+            if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Validando propiedad del recurso para ${entidad}...`);
             try {
                 const esPropietario = await funcionVerificadora(req, res);
+                if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Resultado de validación de propiedad: ${esPropietario ? 'PROPIETARIO' : 'AJENO'}`);
                 if (!esPropietario) {
-                    return res.status(403).json({ 
-                        error: "Acceso denegado", 
-                        mensaje: `Operación rechazada: No posees derechos de propiedad o relación activa con este registro de ${entidad}.` 
-                    });
+                    return res.status(403).json(
+                        DEBUG
+                            ? {
+                                error: "Acceso denegado",
+                                mensaje: `Operación rechazada: No posees derechos de propiedad o relación activa con este registro de ${entidad}.`
+                            }
+                            : {
+                                error: "Acceso denegado",
+                                mensaje: "No puedes acceder a este recurso debido a tu rol actual."
+                            }
+                    );
                 }
             } catch (error) {
                 console.error("Error en propiedad inyectada:", error);
@@ -105,6 +137,7 @@ export const requiere_permiso = (requerimientos) => {
 
         // 5. Validación "Fail-Fast" de campos (Cruzando req.body contra permisos.js)
         if ((accion === "edit" || accion === "add") && camposFinalesPermitidos) {
+            if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Verificando lista blanca de campos para [${accion}]...`);
             if (!camposFinalesPermitidos.includes("*")) {
                 const camposEnviados = Object.keys(req.body);
                 
@@ -114,15 +147,24 @@ export const requiere_permiso = (requerimientos) => {
                 );
 
                 if (camposNoPermitidos.length > 0) {
-                    return res.status(400).json({
-                        error: "Petición incorrecta (Bad Request)",
-                        mensaje: `Tu rol no tiene autorización para modificar los siguientes campos: [${camposNoPermitidos.join(", ")}].`,
-                        campos_permitidos: camposFinalesPermitidos
-                    });
+                    if (DEBUG) console.warn(`[DEBUG-REQUIERE_PERMISO] Intento de modificar campos no autorizados: [${camposNoPermitidos.join(", ")}]`);
+                    return res.status(400).json(
+                        DEBUG
+                            ? {
+                                error: "Petición incorrecta (Bad Request)",
+                                mensaje: `Tu rol no tiene autorización para modificar los siguientes campos: [${camposNoPermitidos.join(", ")}].`,
+                                campos_permitidos: camposFinalesPermitidos
+                            }
+                            : {
+                                error: "Petición incorrecta",
+                                mensaje: "La solicitud contiene información que no puede ser procesada."
+                            }
+                    );
                 }
             }
         }
 
+        if (DEBUG) console.log(`[DEBUG-REQUIERE_PERMISO] Autorización exitosa para [${accion}] en [${entidad}].`);
         next();
     };
 };

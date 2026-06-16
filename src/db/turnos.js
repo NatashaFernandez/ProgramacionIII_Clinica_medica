@@ -103,4 +103,30 @@ export default class Turnos {
         return turnos.length > 0;
     };
 
+    esTurnoDeMedico = async (
+        id_usuario_medico,
+        id_turno
+    ) => {
+
+        const sql = `
+            SELECT 1
+            FROM turnos_reservas tr
+            INNER JOIN medicos m
+                ON tr.id_medico = m.id_medico
+            WHERE m.id_usuario = ?
+            AND tr.id_turno_reserva = ?
+            AND tr.activo = 1
+            LIMIT 1
+        `;
+
+        const [resultado] = await db.query(
+            sql,
+            [
+                id_usuario_medico,
+                id_turno
+            ]
+        );
+
+        return resultado.length > 0;
+    };
 }
